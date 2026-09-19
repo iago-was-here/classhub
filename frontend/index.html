@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <title>ClassHub</title>
+        <style>
+            body { background-color: #f8f9fa; padding: 20px; }
+            #messages-area { height: 400px; overflow-y: auto; background: white; padding: 15px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #ddd; }
+        </style>
+    </head>
+    <body>
+        <div class="container" style="max-width: 600px;">
+            <h3 class="mb-3 text-center">ClassHub (Frontend -> Message -> Auth)</h3>
+            
+            <div id="messages-area">
+                <!-- As mensagens aparecerão aqui -->
+            </div>
+            
+            <div class="input-group mb-3">
+                <input type="text" id="input-box" class="form-control" placeholder="Digite sua mensagem...">
+                <button id="send-button" class="btn btn-primary" type="button">Enviar</button>
+            </div>
+        </div>
+
+        <script>
+            const messagesArea = document.getElementById('messages-area');
+            const input = document.getElementById('input-box');
+            const sendButton = document.getElementById('send-button');
+
+            // Simulação do Token JWT que o Frontend teria após o login
+            const myFakeToken = "token_super_secreto_123";
+
+            // Mensagem na tela 
+            function renderMessage(name, msg, side, style) {
+                const time = new Date().toLocaleTimeString();
+                const msgHtml = `
+                    <div class="card text-white bg-${style} mb-2 w-75 float-${side === 'start' ? 'start' : 'end'}" style="clear: both;">
+                        <div class="card-body p-2">
+                            <h6 class="card-subtitle mb-1 text-light"><small>${name} - ${time}</small></h6>
+                            <p class="card-text mb-0">${msg}</p>
+                        </div>
+                    </div>
+                `;
+                messagesArea.innerHTML += msgHtml;
+                messagesArea.scrollIntoView(false);
+            }
+
+            //Enviando para o microsserviço
+            async function publishMessage() {
+                const msgText = input.value.trim();
+                if (msgText === '') return;
+                
+                input.value = ''; // Limpa o campo
+                renderMessage('Você (Enviando...)', msgText, 'end', 'secondary');
+
+                try {
+                    // Comunicação HTTP com o Message Service
+                    const response = await fetch('http://localhost:8080/api/messages', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: msgText, token: myFakeToken })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Backend aceitou e o Auth Service validou
+                        renderMessage('Sistema', `Sucesso! O AuthService reconheceu você como: ${data.author}`, 'start', 'success');
+                    } else {
+                        // Backend recusou
+                        renderMessage('Sistema', `Erro: ${data.error}`, 'start', 'danger');
+                    }
+                } catch (error) {
+                    renderMessage('Sistema', 'Falha ao conectar com o Message Service (Caiu?)', 'start', 'danger');
+                }
+            }
+
+            sendButton.addEventListener("click", publishMessage);
+            input.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') publishMessage();
+            });
+        </script>
+    </body>
+</html>
