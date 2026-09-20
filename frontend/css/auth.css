@@ -1,26 +1,40 @@
 /* ==========================================================================
-   ClassHub - Estilos de Autenticação (Inspirado no SUAP / IFSULDEMINAS)
+   ClassHub - Tema Onyx & Crimson (Foco no Preto Absoluto e Alto Contraste)
    ========================================================================== */
 
 :root {
-  --suap-bg-dark: #053b30;
-  --suap-bg-accent: #0b4e40;
-  --suap-green-primary: #00c996;
-  --suap-green-hover: #00b083;
-  --suap-green-active: #009972;
-  --suap-text-light: #f8fafc;
-  --suap-text-muted: #a3cfbb;
-  --suap-card-bg: #ffffff;
-  --suap-card-text: #1e293b;
-  --suap-border-color: #e2e8f0;
-  --suap-input-border: #cbd5e1;
-  --suap-input-focus: #00c996;
-  --suap-alert-danger-bg: #fde8e8;
-  --suap-alert-danger-text: #9b1c1c;
-  --suap-alert-danger-border: #f8b4b4;
-  --suap-alert-success-bg: #def7ec;
-  --suap-alert-success-text: #03543f;
-  --suap-alert-success-border: #bcf0da;
+  /* Paleta Onyx & Crimson */
+  --bg-dark: #121212;
+  --bg-pure-black: #000000;
+  --card-bg: #1E1E1E;
+  --card-bg-elevated: #27272A;
+  
+  /* Carmesim / Ação */
+  --crimson-primary: #E11D48;
+  --crimson-hover: #D90429;
+  --crimson-active: #BE123C;
+  --crimson-glow: rgba(225, 29, 72, 0.35);
+  
+  /* Textos e Tipografia */
+  --text-white: #FFFFFF;
+  --text-light: #F3F4F6;
+  --text-muted: #A1A1AA;
+  --text-dim: #71717A;
+  
+  /* Bordas e Inputs */
+  --border-subtle: #2E2E33;
+  --input-bg: #27272A;
+  --input-border: #3F3F46;
+  --input-focus: #E11D48;
+  
+  /* Alertas Dark */
+  --alert-danger-bg: rgba(225, 29, 72, 0.15);
+  --alert-danger-text: #FECDD3;
+  --alert-danger-border: rgba(225, 29, 72, 0.4);
+  
+  --alert-success-bg: rgba(16, 185, 129, 0.15);
+  --alert-success-text: #A7F3D0;
+  --alert-success-border: rgba(16, 185, 129, 0.4);
 }
 
 * {
@@ -31,20 +45,20 @@
 
 body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: var(--suap-bg-dark);
+  background-color: var(--bg-dark);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  color: var(--suap-card-text);
+  color: var(--text-light);
   overflow-x: hidden;
 }
 
-/* Fundo Geral com Efeitos de Linhas e Curvas Orgânicas */
+/* Fundo Geral com Atmosfera Onyx & Detalhes Sutis em Carmesim */
 .auth-wrapper {
   min-height: 100vh;
   display: flex;
   position: relative;
-  background: radial-gradient(circle at 20% 30%, #0d5647 0%, var(--suap-bg-dark) 70%);
+  background: radial-gradient(circle at 18% 22%, #1b0a10 0%, #121212 55%, var(--bg-pure-black) 100%);
   overflow: hidden;
 }
 
@@ -56,7 +70,7 @@ body {
   left: -10%;
   width: 70vw;
   height: 140vh;
-  background: radial-gradient(circle, rgba(0, 201, 150, 0.08) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(225, 29, 72, 0.06) 0%, transparent 65%);
   pointer-events: none;
   z-index: 1;
 }
@@ -68,7 +82,7 @@ body {
   left: 20%;
   width: 50vw;
   height: 80vh;
-  border: 2px solid rgba(0, 201, 150, 0.12);
+  border: 2px solid rgba(225, 29, 72, 0.08);
   border-radius: 45%;
   pointer-events: none;
   z-index: 1;
@@ -84,14 +98,14 @@ body {
   z-index: 2;
 }
 
-/* Coluna da Esquerda (Identidade Institucional) */
+/* Coluna da Esquerda (Identidade Institucional e Ilustração) */
 .auth-brand-side {
   flex: 1.1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 3.5rem 4rem;
-  color: var(--suap-text-light);
+  color: var(--text-light);
   position: relative;
 }
 
@@ -105,19 +119,26 @@ body {
   font-size: 2.75rem;
   font-weight: 800;
   letter-spacing: -1px;
-  color: #ffffff;
+  color: var(--text-white);
   line-height: 1;
   text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.brand-logo-text:hover {
+  opacity: 0.92;
+  color: var(--text-white);
 }
 
 .brand-logo-text span {
-  color: var(--suap-green-primary);
+  color: var(--crimson-primary);
+  text-shadow: 0 0 16px rgba(225, 29, 72, 0.4);
 }
 
 .brand-divider {
   width: 2px;
   height: 42px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .brand-institution {
@@ -131,14 +152,14 @@ body {
   font-weight: 800;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: #ffffff;
+  color: var(--text-white);
   margin-bottom: 2px;
 }
 
 .institution-subtitle {
   font-size: 0.78rem;
   font-weight: 400;
-  color: var(--suap-text-muted);
+  color: var(--text-muted);
 }
 
 .brand-hero {
@@ -149,7 +170,7 @@ body {
 .brand-slogan {
   font-size: 1.35rem;
   line-height: 1.5;
-  color: #d1fae5;
+  color: var(--text-light);
   font-weight: 300;
   margin-bottom: 2rem;
 }
@@ -159,7 +180,7 @@ body {
   max-width: 520px;
   margin: 0 auto;
   display: block;
-  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.75));
   transition: transform 0.4s ease;
 }
 
@@ -169,16 +190,17 @@ body {
 
 .brand-footer {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-dim);
 }
 
-/* Coluna da Direita (Card Branco com Curva SUAP) */
+/* Coluna da Direita (Card Cinzento Escuro Onyx) */
 .auth-form-side {
   flex: 0.9;
-  background-color: var(--suap-card-bg);
+  background-color: var(--card-bg);
   border-top-left-radius: 40px;
   border-bottom-left-radius: 40px;
-  box-shadow: -15px 0 45px rgba(0, 0, 0, 0.18);
+  box-shadow: -20px 0 50px rgba(0, 0, 0, 0.5);
+  border-left: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -201,33 +223,21 @@ body {
 }
 
 .auth-title {
-  font-size: 2rem;
+  font-size: 2.1rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-white);
   letter-spacing: -0.5px;
   margin: 0;
 }
 
-.suap-badge {
-  background-color: #f1f5f9;
-  color: #64748b;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 0.3rem 0.75rem;
-  border-radius: 9999px;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  border: 1px solid #e2e8f0;
-}
-
-/* Mensagens de Alerta (Estilo SUAP) */
+/* Mensagens de Alerta Estilo Dark */
 .suap-alert {
   display: none;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  font-size: 0.85rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
   line-height: 1.4;
   margin-bottom: 1.5rem;
   animation: fadeIn 0.3s ease;
@@ -238,23 +248,23 @@ body {
 }
 
 .suap-alert-danger {
-  background-color: var(--suap-alert-danger-bg);
-  color: var(--suap-alert-danger-text);
-  border: 1px solid var(--suap-alert-danger-border);
+  background-color: var(--alert-danger-bg);
+  color: var(--alert-danger-text);
+  border: 1px solid var(--alert-danger-border);
 }
 
 .suap-alert-success {
-  background-color: var(--suap-alert-success-bg);
-  color: var(--suap-alert-success-text);
-  border: 1px solid var(--suap-alert-success-border);
+  background-color: var(--alert-success-bg);
+  color: var(--alert-success-text);
+  border: 1px solid var(--alert-success-border);
 }
 
 .suap-alert-icon {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   flex-shrink: 0;
 }
 
-/* Campos de Formulário SUAP Clean */
+/* Campos de Formulário Onyx */
 .form-group-suap {
   margin-bottom: 1.35rem;
   position: relative;
@@ -263,49 +273,55 @@ body {
 .form-label-suap {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.82rem;
+  gap: 0.45rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.4rem;
+  color: var(--text-light);
+  margin-bottom: 0.45rem;
 }
 
 .form-label-suap i {
-  font-size: 0.9rem;
-  color: #6b7280;
+  font-size: 0.95rem;
+  color: var(--crimson-primary);
 }
 
 .form-control-suap {
   width: 100%;
-  border: 1.5px solid #d1d5db;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--input-border);
+  border-radius: 10px;
+  padding: 0.78rem 1rem;
   font-size: 0.95rem;
-  color: #1f2937;
-  background-color: #ffffff;
+  color: var(--text-light);
+  background-color: var(--input-bg);
   transition: all 0.2s ease-in-out;
 }
 
+.form-control-suap::placeholder {
+  color: var(--text-dim);
+}
+
 .form-control-suap:focus {
-  border-color: var(--suap-input-focus);
+  border-color: var(--crimson-primary);
+  background-color: #2e2e33;
+  color: #ffffff;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 201, 150, 0.15);
+  box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.25);
 }
 
 .form-control-suap.is-invalid {
-  border-color: #ef4444;
-  background-color: #fff8f8;
+  border-color: var(--crimson-primary);
+  background-color: rgba(225, 29, 72, 0.08);
 }
 
 .form-control-suap.is-invalid:focus {
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+  box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.35);
 }
 
 .invalid-feedback-suap {
   display: none;
-  color: #dc2626;
-  font-size: 0.78rem;
-  margin-top: 0.35rem;
+  color: #fda4af;
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
   font-weight: 500;
 }
 
@@ -325,55 +341,55 @@ body {
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #6b7280;
+  color: var(--text-muted);
   cursor: pointer;
   padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   transition: color 0.2s;
 }
 
 .password-toggle-btn:hover {
-  color: #111827;
+  color: var(--text-white);
 }
 
-/* Botão Principal Estilo SUAP (Verde vibrante em pílula) */
+/* Botão Principal Estilo Onyx & Crimson */
 .btn-suap-primary {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
-  padding: 0.85rem 1.5rem;
-  background: linear-gradient(135deg, var(--suap-green-primary) 0%, var(--suap-green-hover) 100%);
+  padding: 0.88rem 1.5rem;
+  background: linear-gradient(135deg, var(--crimson-primary) 0%, var(--crimson-hover) 100%);
   color: #ffffff;
   font-size: 1rem;
   font-weight: 700;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
   border: none;
   border-radius: 50px;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0, 201, 150, 0.28);
+  box-shadow: 0 6px 20px var(--crimson-glow);
   transition: all 0.25s ease;
   margin-top: 1.5rem;
   margin-bottom: 1.25rem;
 }
 
 .btn-suap-primary:hover {
-  background: linear-gradient(135deg, var(--suap-green-hover) 0%, var(--suap-green-active) 100%);
-  box-shadow: 0 8px 24px rgba(0, 201, 150, 0.4);
+  background: linear-gradient(135deg, #f43f5e 0%, var(--crimson-primary) 100%);
+  box-shadow: 0 8px 26px rgba(225, 29, 72, 0.55);
   transform: translateY(-1px);
 }
 
 .btn-suap-primary:active {
   transform: translateY(1px);
-  box-shadow: 0 3px 10px rgba(0, 201, 150, 0.2);
+  box-shadow: 0 3px 12px rgba(225, 29, 72, 0.3);
 }
 
 .btn-suap-primary:disabled {
-  opacity: 0.65;
+  opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
@@ -383,72 +399,45 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.15rem;
+  gap: 1rem;
   margin-top: 0.75rem;
 }
 
 .link-suap {
-  color: #0b4e40;
+  color: #fb7185;
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: 0.88rem;
   font-weight: 500;
   transition: color 0.2s, text-decoration 0.2s;
 }
 
 .link-suap:hover {
-  color: var(--suap-green-primary);
+  color: #ffffff;
   text-decoration: underline;
-}
-
-/* Botão Institucional GOV.BR */
-.btn-govbr {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.75rem 1.25rem;
-  background-color: #f3f4f6;
-  color: #1351b4;
-  font-size: 0.9rem;
-  font-weight: 700;
-  border: 1px solid #e5e7eb;
-  border-radius: 50px;
-  text-decoration: none;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-
-.btn-govbr:hover {
-  background-color: #e5e7eb;
-  color: #0c326f;
-  transform: translateY(-1px);
-}
-
-.btn-govbr img,
-.btn-govbr svg {
-  height: 20px;
 }
 
 /* Rodapé do Card */
 .auth-card-footer {
   margin-top: 2rem;
   padding-top: 1.25rem;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--border-subtle);
   text-align: center;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .auth-card-footer a {
   display: block;
-  margin-top: 0.25rem;
+  margin-top: 0.35rem;
   font-weight: 600;
-  color: var(--suap-bg-dark);
+  color: var(--crimson-primary);
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
 .auth-card-footer a:hover {
-  color: var(--suap-green-primary);
+  color: #fda4af;
+  text-decoration: underline;
 }
 
 /* Animações e Loading */
@@ -469,53 +458,79 @@ body {
   border-width: 0.18em;
 }
 
-/* Responsividade Mobile e Telas Médias */
+/* ==========================================================================
+   LAYOUT RESPONSIVO (Telas menores / Mobile e Tablets)
+   - Oculta completamente a ilustração (celular e crianças) e detalhes institucionais
+   - Mantém no topo apenas o nome "ClassHub"
+   - Centraliza perfeitamente o card de Login / Cadastro / Recuperação no meio
+   ========================================================================== */
 @media (max-width: 992px) {
   .auth-container {
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1.25rem;
+    min-height: 100vh;
   }
 
+  /* Coluna da Marca no Mobile: Apenas o nome ClassHub centralizado no topo */
   .auth-brand-side {
-    padding: 2.5rem 1.5rem;
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 480px;
+    padding: 0 0 1.5rem 0;
     align-items: center;
     text-align: center;
   }
 
-  .brand-hero {
-    margin: 1.5rem 0;
+  .brand-header {
+    justify-content: center;
+    width: 100%;
+    margin: 0;
   }
 
-  .brand-slogan {
-    font-size: 1.1rem;
+  .brand-logo-text {
+    font-size: 2.6rem;
   }
 
-  .brand-illustration {
-    max-width: 320px;
+  /* Oculta a ilustração com celular e crianças, slogans e rodapé institucional */
+  .brand-hero,
+  .brand-illustration,
+  .brand-slogan,
+  .brand-divider,
+  .brand-institution,
+  .brand-footer {
+    display: none !important;
   }
 
+  /* Card de formulário centralizado no meio da tela no Mobile */
   .auth-form-side {
-    border-top-left-radius: 30px;
-    border-top-right-radius: 30px;
-    border-bottom-left-radius: 0;
-    padding: 2.5rem 1.5rem;
-    box-shadow: 0 -15px 35px rgba(0, 0, 0, 0.15);
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    border-radius: 24px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--border-subtle);
+    padding: 2.5rem 1.75rem;
   }
 }
 
 @media (max-width: 480px) {
-  .brand-logo-text {
-    font-size: 2.2rem;
+  .auth-container {
+    padding: 1.5rem 1rem;
   }
 
-  .institution-title {
-    font-size: 0.72rem;
+  .brand-logo-text {
+    font-size: 2.25rem;
   }
 
   .auth-title {
-    font-size: 1.7rem;
+    font-size: 1.8rem;
   }
 
   .auth-form-side {
     padding: 2rem 1.25rem;
+    border-radius: 20px;
   }
 }

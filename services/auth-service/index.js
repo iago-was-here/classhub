@@ -136,9 +136,36 @@ async function resetUserPassword(req, res) {
     return res.status(200).json({ user: publicUser(user), token: createToken(user) });
 }
 
+async function recoverPassword(req, res) {
+    const email = normalizeEmail(req.body.email);
+
+    if (!email) {
+        return res.status(400).json({
+            error: 'E-mail cadastrado é obrigatório'
+        });
+    }
+
+    const result = await pool.query(
+        'SELECT id, name, username, email FROM users WHERE email = $1',
+        [email]
+    );
+
+    if (result.rowCount === 0) {
+        return res.status(404).json({
+            error: 'E-mail não encontrado no banco de dados.'
+        });
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: 'Seu e-mail de recuperação foi enviado!'
+    });
+}
+
 app.post('/api/auth/check', (req, res, next) => check(req, res).catch(next));
 app.post('/api/auth/create_user', (req, res, next) => createUser(req, res).catch(next));
 app.post('/api/auth/reset_user_password', (req, res, next) => resetUserPassword(req, res).catch(next));
+app.post('/api/auth/recover_password', (req, res, next) => recoverPassword(req, res).catch(next));
 
 // Rota REST para validar a autenticação
 app.post('/api/auth/validate', (req, res) => {

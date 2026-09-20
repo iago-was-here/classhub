@@ -3,174 +3,514 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ClassHub - Ambiente Acadêmico</title>
+  <title>ClassHub - Ambiente Acadêmico IFSULDEMINAS</title>
   
-  <!-- Bootstrap 5 & Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap 5 Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   
-  <style>
-    :root {
-      --primary-color: #06392f;
-      --accent-color: #00c996;
-    }
-    body {
-      background-color: #f1f5f9;
-      font-family: system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
-    }
-    .navbar-classhub {
-      background-color: var(--primary-color);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    .brand-logo-text {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: #ffffff;
-      text-decoration: none;
-    }
-    .brand-logo-text span {
-      color: var(--accent-color);
-    }
-    #messages-area {
-      height: 420px;
-      overflow-y: auto;
-      background: #ffffff;
-      padding: 1.25rem;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-    }
-    .btn-accent {
-      background-color: var(--accent-color);
-      color: #ffffff;
-      font-weight: 600;
-      border: none;
-    }
-    .btn-accent:hover {
-      background-color: #00b083;
-      color: #ffffff;
-    }
-  </style>
+  <!-- Estilos Globais e do Chat Onyx & Crimson -->
+  <link rel="stylesheet" href="css/chat.css">
 </head>
 <body>
-  <!-- Header de Navegação -->
-  <nav class="navbar navbar-classhub navbar-dark py-2">
-    <div class="container-fluid px-4">
-      <a class="brand-logo-text" href="#">class<span>hub</span></a>
+  <div class="app-container">
+    
+    <!-- Backdrop para fechar a sidebar no mobile -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+    <!-- ==========================================================================
+         SIDEBAR LATERAL (Estilo Gemini / Grupos e Canais Acadêmicos)
+         ========================================================================== -->
+    <aside id="chat-sidebar" class="chat-sidebar">
       
-      <div class="d-flex align-items-center gap-3 text-white">
-        <div class="text-end d-none d-sm-block">
-          <div id="user-display-name" class="fw-bold fs-6">Carregando...</div>
-          <small id="user-display-email" class="text-white-50">...</small>
-        </div>
-        <button id="btn-logout" class="btn btn-outline-light btn-sm rounded-pill px-3">
-          <i class="bi bi-box-arrow-right me-1"></i> Sair
+      <!-- Topo: Marca e Botão Fechar no Mobile -->
+      <div class="sidebar-header">
+        <a href="#" class="brand-logo-text">classhub
+        </a>
+        <button id="sidebar-close-btn" class="btn-icon-subtle d-md-none" title="Fechar Menu">
+          <i class="bi bi-x-lg"></i>
         </button>
       </div>
-    </div>
-  </nav>
 
-  <!-- Área Principal -->
-  <div class="container py-4" style="max-width: 720px;">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div>
-        <h4 class="mb-0 fw-bold text-dark">Canal Geral de Mensagens</h4>
-        <small class="text-muted">Comunicação acadêmica em tempo real via microsserviços</small>
+      <!-- Ação Principal: Criar Novo Canal de Disciplina -->
+      <div class="sidebar-actions">
+        <button id="btn-open-new-channel" class="btn-new-channel">
+          <i class="bi bi-plus-lg"></i> Novo canal de disciplina
+        </button>
       </div>
-      <span class="badge bg-success rounded-pill px-3 py-2">
-        <i class="bi bi-shield-check me-1"></i> Autenticado
-      </span>
-    </div>
 
-    <!-- Área do Chat / Mensagens -->
-    <div id="messages-area" class="mb-3">
-      <!-- Mensagens renderizadas via JavaScript -->
-    </div>
+      <!-- Campo de Pesquisa Rápida -->
+      <div class="sidebar-search">
+        <div class="search-input-wrapper">
+          <i class="bi bi-search"></i>
+          <input type="text" id="channel-search" placeholder="Pesquisar canais e tópicos...">
+        </div>
+      </div>
 
-    <!-- Campo de Entrada -->
-    <div class="input-group mb-3">
-      <input type="text" id="input-box" class="form-control form-control-lg fs-6" placeholder="Digite uma mensagem acadêmica...">
-      <button id="send-button" class="btn btn-accent btn-lg px-4" type="button">
-        <i class="bi bi-send-fill me-1"></i> Enviar
-      </button>
+      <!-- Conteúdo com Rolagem: Canais e Conversas Recentes -->
+      <div class="sidebar-content">
+        
+        <!-- Seção: Canais de Disciplina -->
+        <div class="sidebar-section-title">
+          <span>Canais de Disciplinas</span>
+          <i class="bi bi-collection"></i>
+        </div>
+        <ul id="channel-list" class="channel-list">
+          <!-- Injetado dinamicamente via JS -->
+        </ul>
+
+        <!-- Seção: Grupos e Discussões Acadêmicas -->
+        <div class="sidebar-section-title">
+          <span>Tópicos & Grupos Recentes</span>
+          <i class="bi bi-chat-left-dots"></i>
+        </div>
+        <ul id="recent-list" class="recent-list">
+          <li class="channel-item" data-topic="Trabalho de Microsserviços">
+            <div class="channel-title-wrap">
+              <i class="bi bi-people-fill text-secondary"></i>
+              <span>Trabalho de Microsserviços</span>
+            </div>
+          </li>
+          <li class="channel-item" data-topic="Dúvidas sobre Prova 1">
+            <div class="channel-title-wrap">
+              <i class="bi bi-question-circle-fill text-secondary"></i>
+              <span>Dúvidas sobre Prova 1</span>
+            </div>
+          </li>
+          <li class="channel-item" data-topic="Laboratório de Redes">
+            <div class="channel-title-wrap">
+              <i class="bi bi-hdd-network-fill text-secondary"></i>
+              <span>Laboratório de Redes</span>
+            </div>
+          </li>
+        </ul>
+
+      </div>
+
+      <!-- ==========================================================================
+           RODAPÉ DO PERFIL (Nome completo e Nome de Usuário / @user)
+           ========================================================================== -->
+      <div class="sidebar-user-footer">
+        <div class="user-profile-info">
+          <div id="user-avatar-badge" class="user-avatar">
+            U
+          </div>
+          <div class="user-details">
+            <div id="user-display-name" class="user-name">Carregando...</div>
+            <div id="user-display-username" class="user-username">@usuario</div>
+          </div>
+        </div>
+        <div class="user-actions">
+          <button id="btn-logout" class="btn-icon-subtle text-danger" title="Encerrar Sessão">
+            <i class="bi bi-box-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ==========================================================================
+         ÁREA PRINCIPAL DO CHAT
+         ========================================================================== -->
+    <main class="chat-main-area">
+      
+      <!-- Topo do Chat (Canal Ativo) -->
+      <header class="chat-top-header">
+        <div class="channel-info-wrapper">
+          <button id="sidebar-toggle-btn" class="btn-mobile-sidebar" title="Abrir Menu">
+            <i class="bi bi-list"></i>
+          </button>
+          <div>
+            <h1 id="active-channel-title" class="active-channel-name">
+              <span>#</span> Sistemas Distribuídos
+            </h1>
+            <p id="active-channel-desc" class="active-channel-desc">
+              Canal oficial de discussões, microsserviços e mensageria distribuída.
+            </p>
+          </div>
+        </div>
+
+        <div class="header-status-badge">
+          <span class="status-dot"></span>
+          <span>Online no Gateway</span>
+        </div>
+      </header>
+
+      <!-- Feed de Mensagens com Scroll -->
+      <section id="messages-stream" class="messages-scroll-area">
+        
+        <!-- Cartão de Boas-Vindas no Canal Ativo -->
+        <div id="channel-welcome" class="channel-welcome-card">
+          <div class="welcome-icon-box">
+            <i class="bi bi-mortarboard-fill"></i>
+          </div>
+          <h2 id="welcome-title" class="welcome-title">Bem-vindo(a) ao canal #Sistemas Distribuídos!</h2>
+          <p id="welcome-desc" class="welcome-desc">
+            Este é o espaço colaborativo para troca de informações, dúvidas de código, materiais acadêmicos e tópicos da faculdade no IFSULDEMINAS.
+          </p>
+        </div>
+
+        <!-- Mensagens renderizadas via JavaScript -->
+        <div id="messages-container"></div>
+
+      </section>
+
+      <!-- Barra de Entrada Flutuante Estilo Gemini -->
+      <footer class="chat-bottom-bar">
+        <div class="input-floating-card">
+          <button class="input-icon-btn" title="Adicionar anexo ou código">
+            <i class="bi bi-paperclip"></i>
+          </button>
+          <input 
+            type="text" 
+            id="chat-input" 
+            class="chat-input-field" 
+            placeholder="Envie uma mensagem para a turma de Sistemas Distribuídos..."
+            autocomplete="off"
+          >
+          <button id="chat-send-btn" class="btn-chat-send" title="Enviar mensagem">
+            <i class="bi bi-send-fill"></i>
+          </button>
+        </div>
+        <div class="chat-footer-disclaimer">
+          ClassHub &bull; Ambiente Acadêmico IFSULDEMINAS &bull; Comunicação em tempo real via microsserviços
+        </div>
+      </footer>
+
+    </main>
+
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: CRIAR NOVO CANAL DE DISCIPLINA
+       ========================================================================== -->
+  <div id="new-channel-modal" class="custom-modal-backdrop">
+    <div class="custom-modal-dialog">
+      <div class="custom-modal-header">
+        <h3 class="custom-modal-title">
+          <i class="bi bi-plus-circle-fill text-danger me-2"></i> Criar Canal de Disciplina
+        </h3>
+        <button id="modal-close-x" class="btn-icon-subtle">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="custom-modal-body">
+        <form id="new-channel-form">
+          <div style="margin-bottom: 1.25rem;">
+            <label for="new-channel-name-input" style="font-size: 0.85rem; font-weight: 600; color: #F3F4F6; display: block; margin-bottom: 0.4rem;">
+              Nome da Disciplina / Canal:
+            </label>
+            <input 
+              type="text" 
+              id="new-channel-name-input" 
+              placeholder="ex: Engenharia de Software, Cálculo I, IA"
+              style="width: 100%; padding: 0.75rem 1rem; background: #27272A; border: 1.5px solid #3F3F46; border-radius: 10px; color: #F3F4F6; outline: none;"
+              required
+            >
+          </div>
+          <div>
+            <label for="new-channel-desc-input" style="font-size: 0.85rem; font-weight: 600; color: #F3F4F6; display: block; margin-bottom: 0.4rem;">
+              Descrição / Ementa (Opcional):
+            </label>
+            <input 
+              type="text" 
+              id="new-channel-desc-input" 
+              placeholder="ex: Discussões, exercícios e dúvidas de aula"
+              style="width: 100%; padding: 0.75rem 1rem; background: #27272A; border: 1.5px solid #3F3F46; border-radius: 10px; color: #F3F4F6; outline: none;"
+            >
+          </div>
+        </form>
+      </div>
+      <div class="custom-modal-footer">
+        <button id="modal-cancel-btn" class="btn-modal-cancel">Cancelar</button>
+        <button id="modal-submit-btn" class="btn-modal-create">Criar Canal</button>
+      </div>
     </div>
   </div>
 
+  <!-- Scripts -->
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
   <script>
-    // 1. Verificação de Sessão (Guarda de Rota)
-    const token = ClassHubAuth.getToken();
-    const user = ClassHubAuth.getUser();
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Verificação de Autenticação (Guarda de Rota)
+      const token = ClassHubAuth.getToken();
+      const user = ClassHubAuth.getUser();
 
-    if (!token) {
-      // Redireciona para o login caso não esteja autenticado
-      window.location.replace('login.html');
-    }
+      if (!token) {
+        window.location.replace('login.html');
+        return;
+      }
 
-    // 2. Preenchimento de dados do Usuário
-    if (user) {
-      document.getElementById('user-display-name').textContent = user.name || user.username || 'Estudante';
-      document.getElementById('user-display-email').textContent = user.email || '';
-    }
-
-    // 3. Logout
-    document.getElementById('btn-logout').addEventListener('click', () => {
-      ClassHubAuth.clearAuth();
-      window.location.href = 'login.html';
-    });
-
-    // 4. Integração de Mensagens
-    const messagesArea = document.getElementById('messages-area');
-    const input = document.getElementById('input-box');
-    const sendButton = document.getElementById('send-button');
-
-    function renderMessage(name, msg, side, style) {
-      const time = new Date().toLocaleTimeString();
-      const msgHtml = `
-        <div class="card text-white bg-${style} mb-2 w-75 float-${side === 'start' ? 'start' : 'end'}" style="clear: both; border-radius: 10px;">
-          <div class="card-body p-2">
-            <h6 class="card-subtitle mb-1 text-light"><small>${name} • ${time}</small></h6>
-            <p class="card-text mb-0">${msg}</p>
-          </div>
-        </div>
-      `;
-      messagesArea.innerHTML += msgHtml;
-      messagesArea.scrollTop = messagesArea.scrollHeight;
-    }
-
-    // Mensagem de boas-vindas do sistema
-    renderMessage('Sistema ClassHub', `Bem-vindo(a), ${user?.name || 'usuário'}! Você está conectado ao canal acadêmico.`, 'start', 'dark');
-
-    async function publishMessage() {
-      const msgText = input.value.trim();
-      if (msgText === '') return;
+      // 2. Preenchimento de dados do Perfil no Rodapé da Sidebar
+      // "abaixo deixe o nome da pessoa e o nome do user que ela criou ao se cadastrar"
+      const displayName = user?.name || 'Estudante IF';
+      const displayUsername = user?.username ? `@${user.username}` : (user?.email ? `@${user.email.split('@')[0]}` : '@estudante');
       
-      input.value = '';
-      renderMessage(user?.name || 'Você', msgText, 'end', 'primary');
+      document.getElementById('user-display-name').textContent = displayName;
+      document.getElementById('user-display-username').textContent = displayUsername;
 
-      try {
-        const response = await fetch(`${CONFIG.GATEWAY_URL}/api/messages`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: msgText, token: token })
+      // Iniciais do Avatar
+      const initials = displayName.split(' ').map(n => n[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || 'U';
+      document.getElementById('user-avatar-badge').textContent = initials;
+
+      // 3. Logout
+      document.getElementById('btn-logout').addEventListener('click', () => {
+        ClassHubAuth.clearAuth();
+        window.location.href = 'login.html';
+      });
+
+      // 4. Gerenciamento de Canais de Disciplina (com persistência em LocalStorage)
+      const defaultChannels = [
+        { id: 'sistemas-distribuidos', name: 'Sistemas Distribuídos', desc: 'Canal oficial de discussões, microsserviços e mensageria distribuída.' },
+        { id: 'banco-de-dados', name: 'Banco de Dados', desc: 'Modelagem relacional, SQL, PostgreSQL e otimização de consultas.' },
+        { id: 'redes-computadores', name: 'Redes de Computadores', desc: 'Protocolos TCP/IP, roteamento, camadas OSI e segurança de rede.' },
+        { id: 'inteligencia-artificial', name: 'Inteligência Artificial', desc: 'Algoritmos de busca, aprendizado de máquina e redes neurais.' }
+      ];
+
+      function getChannels() {
+        try {
+          const stored = localStorage.getItem('classhub_custom_channels');
+          if (stored) {
+            return [...defaultChannels, ...JSON.parse(stored)];
+          }
+        } catch (e) {}
+        return defaultChannels;
+      }
+
+      function saveCustomChannel(newChannel) {
+        try {
+          const stored = JSON.parse(localStorage.getItem('classhub_custom_channels') || '[]');
+          stored.push(newChannel);
+          localStorage.setItem('classhub_custom_channels', JSON.stringify(stored));
+        } catch (e) {
+          console.error('Erro ao salvar canal:', e);
+        }
+      }
+
+      let activeChannel = getChannels()[0];
+      const channelListEl = document.getElementById('channel-list');
+      const activeTitleEl = document.getElementById('active-channel-title');
+      const activeDescEl = document.getElementById('active-channel-desc');
+      const welcomeTitleEl = document.getElementById('welcome-title');
+      const welcomeDescEl = document.getElementById('welcome-desc');
+      const chatInput = document.getElementById('chat-input');
+      const messagesContainer = document.getElementById('messages-container');
+      const messagesStream = document.getElementById('messages-stream');
+
+      function renderChannels(filterText = '') {
+        const channels = getChannels();
+        channelListEl.innerHTML = '';
+
+        channels
+          .filter(c => c.name.toLowerCase().includes(filterText.toLowerCase()))
+          .forEach(channel => {
+            const li = document.createElement('li');
+            li.className = `channel-item ${channel.id === activeChannel.id ? 'active' : ''}`;
+            li.innerHTML = `
+              <div class="channel-title-wrap">
+                <span class="channel-hash">#</span>
+                <span>${channel.name}</span>
+              </div>
+            `;
+            li.addEventListener('click', () => {
+              selectChannel(channel);
+              closeSidebarMobile();
+            });
+            channelListEl.appendChild(li);
+          });
+      }
+
+      function selectChannel(channel) {
+        activeChannel = channel;
+        activeTitleEl.innerHTML = `<span>#</span> ${channel.name}`;
+        activeDescEl.textContent = channel.desc || `Discussões e tópicos de ${channel.name}.`;
+        welcomeTitleEl.textContent = `Bem-vindo(a) ao canal #${channel.name}!`;
+        welcomeDescEl.textContent = channel.desc || `Espaço para compartilhamento e dúvidas de ${channel.name}.`;
+        chatInput.placeholder = `Envie uma mensagem para a turma de ${channel.name}...`;
+        renderChannels();
+        
+        // Mensagem de sistema ao trocar de canal
+        appendMessage({
+          name: 'ClassHub',
+          username: '@sistema',
+          text: `Você entrou no canal #${channel.name}.`,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          isSystem: true
+        });
+      }
+
+      // Busca de Canais na Sidebar
+      const searchInput = document.getElementById('channel-search');
+      searchInput.addEventListener('input', (e) => {
+        renderChannels(e.target.value);
+      });
+
+      // Tópicos Recentes
+      document.querySelectorAll('#recent-list .channel-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const topic = item.dataset.topic;
+          selectChannel({
+            id: topic.toLowerCase().replace(/\s+/g, '-'),
+            name: topic,
+            desc: `Discussão do grupo acadêmico sobre ${topic}.`
+          });
+          closeSidebarMobile();
+        });
+      });
+
+      // 5. Mensageria e Envio de Mensagens
+      function appendMessage({ name, username, text, time, isOwn = false, isSystem = false }) {
+        const row = document.createElement('div');
+        row.className = `chat-msg-row ${isOwn ? 'msg-own' : ''} ${isSystem ? 'msg-system' : ''}`;
+
+        const initials = (name || 'U').split(' ').map(n => n[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+
+        row.innerHTML = `
+          <div class="msg-avatar">${initials}</div>
+          <div class="msg-body-wrapper">
+            <div class="msg-meta">
+              <span class="msg-author-name">${name}</span>
+              <span class="msg-author-username">${username}</span>
+              <span class="msg-time">&bull; ${time}</span>
+            </div>
+            <div class="msg-bubble">${escapeHtml(text)}</div>
+          </div>
+        `;
+
+        messagesContainer.appendChild(row);
+        messagesStream.scrollTop = messagesStream.scrollHeight;
+      }
+
+      function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      async function publishMessage() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        chatInput.value = '';
+        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        // Renderiza mensagem enviada pelo usuário logado
+        appendMessage({
+          name: displayName,
+          username: displayUsername,
+          text: text,
+          time: now,
+          isOwn: true
         });
 
-        const data = await response.json().catch(() => ({}));
+        try {
+          const response = await fetch(`${CONFIG.GATEWAY_URL}/api/messages`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              text: `[#${activeChannel.name}] ${text}`, 
+              token: token 
+            })
+          });
 
-        if (response.ok) {
-          renderMessage('Sistema', `Mensagem recebida pelo Message Service. Autor validado: ${data.author || user?.email}`, 'start', 'success');
-        } else {
-          renderMessage('Sistema', `Erro: ${data.error || 'Não autorizado'}`, 'start', 'danger');
+          const data = await response.json().catch(() => ({}));
+
+          if (response.ok && data.success) {
+            // Confirmação sutil do microserviço
+            console.log('[Message Service] Mensagem persistida e processada:', data);
+          } else {
+            appendMessage({
+              name: 'Sistema',
+              username: '@gateway',
+              text: `Aviso do Gateway: ${data.error || 'Mensagem não processada pelo serviço de mensagens.'}`,
+              time: now,
+              isSystem: true
+            });
+          }
+        } catch (error) {
+          console.warn('[Message Service] Não foi possível conectar ao Gateway na porta 8080:', error);
         }
-      } catch (error) {
-        renderMessage('Sistema', 'Falha ao conectar ao Message Service (via Gateway 8080).', 'start', 'danger');
       }
-    }
 
-    sendButton.addEventListener('click', publishMessage);
-    input.addEventListener('keyup', (e) => {
-      if (e.key === 'Enter') publishMessage();
+      const sendBtn = document.getElementById('chat-send-btn');
+      sendBtn.addEventListener('click', publishMessage);
+      chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          publishMessage();
+        }
+      });
+
+      // 6. Modal de Criação de Canal de Disciplina
+      const modalBackdrop = document.getElementById('new-channel-modal');
+      const openModalBtn = document.getElementById('btn-open-new-channel');
+      const closeModalX = document.getElementById('modal-close-x');
+      const cancelModalBtn = document.getElementById('modal-cancel-btn');
+      const submitModalBtn = document.getElementById('modal-submit-btn');
+      const channelNameInput = document.getElementById('new-channel-name-input');
+      const channelDescInput = document.getElementById('new-channel-desc-input');
+
+      function openModal() {
+        modalBackdrop.classList.add('show');
+        channelNameInput.value = '';
+        channelDescInput.value = '';
+        setTimeout(() => channelNameInput.focus(), 100);
+      }
+
+      function closeModal() {
+        modalBackdrop.classList.remove('show');
+      }
+
+      openModalBtn.addEventListener('click', openModal);
+      closeModalX.addEventListener('click', closeModal);
+      cancelModalBtn.addEventListener('click', closeModal);
+
+      modalBackdrop.addEventListener('click', (e) => {
+        if (e.target === modalBackdrop) closeModal();
+      });
+
+      submitModalBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const name = channelNameInput.value.trim();
+        const desc = channelDescInput.value.trim();
+
+        if (!name) {
+          channelNameInput.style.borderColor = 'var(--crimson-primary)';
+          return;
+        }
+
+        const id = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '-');
+        const newChan = { id, name, desc: desc || `Canal acadêmico de ${name}` };
+
+        saveCustomChannel(newChan);
+        closeModal();
+        renderChannels();
+        selectChannel(newChan);
+      });
+
+      // 7. Responsividade da Sidebar no Mobile
+      const sidebar = document.getElementById('chat-sidebar');
+      const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+      const toggleBtn = document.getElementById('sidebar-toggle-btn');
+      const closeSidebarBtn = document.getElementById('sidebar-close-btn');
+
+      function openSidebarMobile() {
+        sidebar.classList.add('open');
+        sidebarBackdrop.classList.add('show');
+      }
+
+      function closeSidebarMobile() {
+        sidebar.classList.remove('open');
+        sidebarBackdrop.classList.remove('show');
+      }
+
+      toggleBtn.addEventListener('click', openSidebarMobile);
+      closeSidebarBtn.addEventListener('click', closeSidebarMobile);
+      sidebarBackdrop.addEventListener('click', closeSidebarMobile);
+
+      // Renderização inicial
+      renderChannels();
+      selectChannel(activeChannel);
     });
   </script>
 </body>

@@ -122,6 +122,48 @@ const ClassHubAuth = {
   },
 
   /**
+   * Solicita envio de e-mail de recuperação de senha
+   * @param {string} email 
+   * @returns {Promise<{success: boolean, message?: string, error?: string}>}
+   */
+  async recoverPassword(email) {
+    try {
+      const response = await fetch(CONFIG.ENDPOINTS.RECOVER_PASSWORD, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (response.ok) {
+        return {
+          success: true,
+          message: data.message || 'Seu e-mail de recuperação foi enviado!'
+        };
+      }
+
+      if (response.status === 404) {
+        return {
+          success: false,
+          error: data.error || 'E-mail não encontrado no banco de dados.'
+        };
+      }
+
+      return {
+        success: false,
+        error: data.error || 'Não foi possível processar o pedido de recuperação.'
+      };
+    } catch (err) {
+      console.error('[ClassHub Auth] Erro de rede:', err);
+      return {
+        success: false,
+        error: 'Não foi possível conectar ao servidor (Gateway na porta 8080).'
+      };
+    }
+  },
+
+  /**
    * Salva os dados de autenticação no localStorage
    */
   saveAuth(token, user) {

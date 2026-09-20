@@ -8,7 +8,8 @@ const CONFIG = {
   ENDPOINTS: {
     CHECK: 'http://localhost:8080/api/auth/check',
     CREATE_USER: 'http://localhost:8080/api/auth/create_user',
-    RESET_PASSWORD: 'http://localhost:8080/api/auth/reset_user_password'
+    RESET_PASSWORD: 'http://localhost:8080/api/auth/reset_user_password',
+    RECOVER_PASSWORD: 'http://localhost:8080/api/auth/recover_password'
   },
   STORAGE_KEYS: {
     TOKEN: 'classhub_token',
