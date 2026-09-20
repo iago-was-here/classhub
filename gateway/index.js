@@ -19,7 +19,7 @@ const messagesProxy = createProxyMiddleware({
 });
 
 const authProxy = createProxyMiddleware({ 
-    target: 'http://localhost:8081', 
+    target: 'http://auth-service:8081', 
     changeOrigin: true 
 });
 
