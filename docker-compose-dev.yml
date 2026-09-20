@@ -24,10 +24,11 @@ services:
       - "8080:8080"
     volumes:
       - ./gateway:/app
+      - /app/node_modules
     environment:
-      AUTH_SERVICE=http://auth-service:8081
-      MESSAGE_SERVICE=http://message-service:8082
-      JWT_SECRET=secret
+      AUTH_SERVICE: http://auth-service:8081
+      MESSAGE_SERVICE: http://message-service:8082
+      JWT_SECRET: secret
     depends_on:
       - auth-service
       - message-service
@@ -40,12 +41,14 @@ services:
       - "8081:8081"
     volumes:
       - ./services/auth-service:/app
+      - /app/node_modules
     environment:
-      DB_HOST=postgres
-      DB_PORT=5432
-      DB_NAME=communication
-      DB_USER=postgres
-      DB_PASSWORD=postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: communication
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: secret
     depends_on:
       postgres:
         condition: service_healthy
@@ -58,15 +61,16 @@ services:
       - "8082:8082"
     volumes:
       - ./services/message-service:/app
+      - /app/node_modules
     environment:
-      DB_HOST=postgres
-      DB_PORT=5432
-      DB_NAME=communication
-      DB_USER=postgres
-      DB_PASSWORD=postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: communication
+      DB_USER: postgres
+      DB_PASSWORD: postgres
 
-      RABBITMQ_HOST=rabbitmq
-      RABBITMQ_PORT=5672
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
 
     depends_on:
       postgres:
@@ -76,15 +80,16 @@ services:
 
   notification-service:
     build:
-      context: ./services/notification-service
+      context: ./services/notificaton-service
     container_name: notification-service
     ports:
       - "8083:8083"
     volumes:
-      - ./services/notification-service:/app
+      - ./services/notificaton-service:/app
+      - /app/node_modules
     environment:
-      RABBITMQ_HOST=rabbitmq
-      RABBITMQ_PORT=5672
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
     depends_on:
       rabbitmq:
         condition: service_started
