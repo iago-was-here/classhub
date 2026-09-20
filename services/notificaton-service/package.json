@@ -1,0 +1,9 @@
+{
+  "name": "notification-service",
+  "version": "1.0.0",
+  "description": "Serviço de notificações do ClassHub",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js"
+  }
+}
