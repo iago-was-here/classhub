@@ -1,0 +1,9 @@
+{
+  "name": "classhub-frontend-temp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frontend temporário para testes do ClassHub",
+  "scripts": {
+    "dev": "node server.js"
+  }
+}
