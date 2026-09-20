@@ -1,0 +1,521 @@
+/* ==========================================================================
+   ClassHub - Estilos de Autenticação (Inspirado no SUAP / IFSULDEMINAS)
+   ========================================================================== */
+
+:root {
+  --suap-bg-dark: #053b30;
+  --suap-bg-accent: #0b4e40;
+  --suap-green-primary: #00c996;
+  --suap-green-hover: #00b083;
+  --suap-green-active: #009972;
+  --suap-text-light: #f8fafc;
+  --suap-text-muted: #a3cfbb;
+  --suap-card-bg: #ffffff;
+  --suap-card-text: #1e293b;
+  --suap-border-color: #e2e8f0;
+  --suap-input-border: #cbd5e1;
+  --suap-input-focus: #00c996;
+  --suap-alert-danger-bg: #fde8e8;
+  --suap-alert-danger-text: #9b1c1c;
+  --suap-alert-danger-border: #f8b4b4;
+  --suap-alert-success-bg: #def7ec;
+  --suap-alert-success-text: #03543f;
+  --suap-alert-success-border: #bcf0da;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--suap-bg-dark);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: var(--suap-card-text);
+  overflow-x: hidden;
+}
+
+/* Fundo Geral com Efeitos de Linhas e Curvas Orgânicas */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  position: relative;
+  background: radial-gradient(circle at 20% 30%, #0d5647 0%, var(--suap-bg-dark) 70%);
+  overflow: hidden;
+}
+
+/* Curvas decorativas de fundo em SVG */
+.auth-wrapper::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 70vw;
+  height: 140vh;
+  background: radial-gradient(circle, rgba(0, 201, 150, 0.08) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.auth-wrapper::after {
+  content: "";
+  position: absolute;
+  bottom: -30%;
+  left: 20%;
+  width: 50vw;
+  height: 80vh;
+  border: 2px solid rgba(0, 201, 150, 0.12);
+  border-radius: 45%;
+  pointer-events: none;
+  z-index: 1;
+  transform: rotate(-15deg);
+}
+
+/* Grid Principal em 2 Colunas */
+.auth-container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  z-index: 2;
+}
+
+/* Coluna da Esquerda (Identidade Institucional) */
+.auth-brand-side {
+  flex: 1.1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3.5rem 4rem;
+  color: var(--suap-text-light);
+  position: relative;
+}
+
+.brand-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brand-logo-text {
+  font-size: 2.75rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: #ffffff;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.brand-logo-text span {
+  color: var(--suap-green-primary);
+}
+
+.brand-divider {
+  width: 2px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.brand-institution {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.institution-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+
+.institution-subtitle {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--suap-text-muted);
+}
+
+.brand-hero {
+  margin: auto 0;
+  max-width: 540px;
+}
+
+.brand-slogan {
+  font-size: 1.35rem;
+  line-height: 1.5;
+  color: #d1fae5;
+  font-weight: 300;
+  margin-bottom: 2rem;
+}
+
+.brand-illustration {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  display: block;
+  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.3));
+  transition: transform 0.4s ease;
+}
+
+.brand-illustration:hover {
+  transform: translateY(-4px);
+}
+
+.brand-footer {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Coluna da Direita (Card Branco com Curva SUAP) */
+.auth-form-side {
+  flex: 0.9;
+  background-color: var(--suap-card-bg);
+  border-top-left-radius: 40px;
+  border-bottom-left-radius: 40px;
+  box-shadow: -15px 0 45px rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 4rem;
+  position: relative;
+  z-index: 5;
+}
+
+.auth-card-content {
+  width: 100%;
+  max-width: 440px;
+}
+
+/* Cabeçalho do Card */
+.auth-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.auth-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.suap-badge {
+  background-color: #f1f5f9;
+  color: #64748b;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  border: 1px solid #e2e8f0;
+}
+
+/* Mensagens de Alerta (Estilo SUAP) */
+.suap-alert {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.suap-alert.show {
+  display: flex;
+}
+
+.suap-alert-danger {
+  background-color: var(--suap-alert-danger-bg);
+  color: var(--suap-alert-danger-text);
+  border: 1px solid var(--suap-alert-danger-border);
+}
+
+.suap-alert-success {
+  background-color: var(--suap-alert-success-bg);
+  color: var(--suap-alert-success-text);
+  border: 1px solid var(--suap-alert-success-border);
+}
+
+.suap-alert-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* Campos de Formulário SUAP Clean */
+.form-group-suap {
+  margin-bottom: 1.35rem;
+  position: relative;
+}
+
+.form-label-suap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.4rem;
+}
+
+.form-label-suap i {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.form-control-suap {
+  width: 100%;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  color: #1f2937;
+  background-color: #ffffff;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-control-suap:focus {
+  border-color: var(--suap-input-focus);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 201, 150, 0.15);
+}
+
+.form-control-suap.is-invalid {
+  border-color: #ef4444;
+  background-color: #fff8f8;
+}
+
+.form-control-suap.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.invalid-feedback-suap {
+  display: none;
+  color: #dc2626;
+  font-size: 0.78rem;
+  margin-top: 0.35rem;
+  font-weight: 500;
+}
+
+.form-control-suap.is-invalid ~ .invalid-feedback-suap {
+  display: block;
+}
+
+/* Campo com Botão de Revelar Senha */
+.password-wrapper {
+  position: relative;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: color 0.2s;
+}
+
+.password-toggle-btn:hover {
+  color: #111827;
+}
+
+/* Botão Principal Estilo SUAP (Verde vibrante em pílula) */
+.btn-suap-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  background: linear-gradient(135deg, var(--suap-green-primary) 0%, var(--suap-green-hover) 100%);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 201, 150, 0.28);
+  transition: all 0.25s ease;
+  margin-top: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.btn-suap-primary:hover {
+  background: linear-gradient(135deg, var(--suap-green-hover) 0%, var(--suap-green-active) 100%);
+  box-shadow: 0 8px 24px rgba(0, 201, 150, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-suap-primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 10px rgba(0, 201, 150, 0.2);
+}
+
+.btn-suap-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Links Auxiliares */
+.auth-aux-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.15rem;
+  margin-top: 0.75rem;
+}
+
+.link-suap {
+  color: #0b4e40;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s, text-decoration 0.2s;
+}
+
+.link-suap:hover {
+  color: var(--suap-green-primary);
+  text-decoration: underline;
+}
+
+/* Botão Institucional GOV.BR */
+.btn-govbr {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  background-color: #f3f4f6;
+  color: #1351b4;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: 1px solid #e5e7eb;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn-govbr:hover {
+  background-color: #e5e7eb;
+  color: #0c326f;
+  transform: translateY(-1px);
+}
+
+.btn-govbr img,
+.btn-govbr svg {
+  height: 20px;
+}
+
+/* Rodapé do Card */
+.auth-card-footer {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #f1f5f9;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.auth-card-footer a {
+  display: block;
+  margin-top: 0.25rem;
+  font-weight: 600;
+  color: var(--suap-bg-dark);
+}
+
+.auth-card-footer a:hover {
+  color: var(--suap-green-primary);
+}
+
+/* Animações e Loading */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.spinner-border-sm {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-width: 0.18em;
+}
+
+/* Responsividade Mobile e Telas Médias */
+@media (max-width: 992px) {
+  .auth-container {
+    flex-direction: column;
+  }
+
+  .auth-brand-side {
+    padding: 2.5rem 1.5rem;
+    align-items: center;
+    text-align: center;
+  }
+
+  .brand-hero {
+    margin: 1.5rem 0;
+  }
+
+  .brand-slogan {
+    font-size: 1.1rem;
+  }
+
+  .brand-illustration {
+    max-width: 320px;
+  }
+
+  .auth-form-side {
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    border-bottom-left-radius: 0;
+    padding: 2.5rem 1.5rem;
+    box-shadow: 0 -15px 35px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-logo-text {
+    font-size: 2.2rem;
+  }
+
+  .institution-title {
+    font-size: 0.72rem;
+  }
+
+  .auth-title {
+    font-size: 1.7rem;
+  }
+
+  .auth-form-side {
+    padding: 2rem 1.25rem;
+  }
+}

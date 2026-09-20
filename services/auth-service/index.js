@@ -50,7 +50,8 @@ function validPassword(password) {
 
 async function check(req, res) {
     const { token } = req.body;
-    const email = normalizeEmail(req.body.email);
+    // 1. Pega o username do corpo da requisição em vez do email
+    const username = typeof req.body.username === 'string' ? req.body.username.trim() : '';
     const { password } = req.body;
 
     if (token) {
@@ -62,18 +63,20 @@ async function check(req, res) {
         }
     }
 
-    if (!email || typeof password !== 'string') {
-        return res.status(400).json({ valid: false, error: 'Email e senha são obrigatórios' });
+    // 2. Valida se o username foi enviado
+    if (!username || typeof password !== 'string') {
+        return res.status(400).json({ valid: false, error: 'Nome de usuário e senha são obrigatórios' });
     }
 
+    // 3. Altera a consulta SQL para buscar pela coluna username
     const result = await pool.query(
-        'SELECT id, name, username, email, password_hash FROM users WHERE email = $1',
-        [email]
+        'SELECT id, name, username, email, password_hash FROM users WHERE username = $1',
+        [username]
     );
     const user = result.rows[0];
 
     if (!user || !passwordMatches(password, user.password_hash)) {
-        return res.status(401).json({ valid: false, error: 'Email ou senha inválidos' });
+        return res.status(401).json({ valid: false, error: 'Nome de usuário ou senha inválidos' });
     }
 
     return res.status(200).json({ valid: true, user: publicUser(user), token: createToken(user) });
@@ -102,7 +105,7 @@ async function createUser(req, res) {
         return res.status(201).json({ user: publicUser(user), token: createToken(user) });
     } catch (error) {
         if (error.code === '23505') {
-            return res.status(409).json({ error: 'Email já cadastrado' });
+            return res.status(409).json({ error: 'Email ou nome de usuário já cadastrado' });
         }
         throw error;
     }

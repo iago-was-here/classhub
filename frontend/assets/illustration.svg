@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="phoneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="screenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#093f35"/>
+      <stop offset="100%" stop-color="#062e26"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00c996"/>
+      <stop offset="100%" stop-color="#00b074"/>
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Ground Shadow/Spot -->
+  <ellipse cx="290" cy="430" rx="240" ry="26" fill="#042720" opacity="0.5"/>
+
+  <!-- Left Floating Message Bubbles -->
+  <g transform="translate(45, 180)" filter="url(#dropShadow)">
+    <rect x="0" y="0" width="120" height="60" rx="10" fill="#1b5a4e" stroke="#257a6b" stroke-width="1.5"/>
+    <rect x="14" y="14" width="30" height="7" rx="3.5" fill="#00c996"/>
+    <rect x="14" y="28" width="90" height="5" rx="2.5" fill="#a0d9cb"/>
+    <rect x="14" y="39" width="65" height="5" rx="2.5" fill="#a0d9cb" opacity="0.6"/>
+  </g>
+
+  <g transform="translate(50, 310)" filter="url(#dropShadow)">
+    <rect x="0" y="0" width="70" height="50" rx="10" fill="#1b5a4e" stroke="#257a6b" stroke-width="1.5"/>
+    <circle cx="25" cy="25" r="10" fill="#00c996" opacity="0.8"/>
+    <path d="M42 21h16M42 29h10" stroke="#a0d9cb" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Big Smartphone Model -->
+  <g transform="translate(140, 100)" filter="url(#dropShadow)">
+    <!-- Outer Phone Body -->
+    <rect x="0" y="0" width="160" height="310" rx="24" fill="url(#phoneGrad)" stroke="#334155" stroke-width="3"/>
+    <!-- Screen -->
+    <rect x="10" y="16" width="140" height="278" rx="14" fill="url(#screenGrad)"/>
+    <!-- Speaker & Camera -->
+    <rect x="65" y="8" width="30" height="4" rx="2" fill="#475569"/>
+    
+    <!-- App UI Mockup on screen -->
+    <!-- App Header -->
+    <rect x="18" y="26" width="124" height="22" rx="4" fill="#0c4d41"/>
+    <circle cx="28" cy="37" r="4" fill="#00c996"/>
+    <rect x="38" y="34" width="45" height="6" rx="3" fill="#ffffff"/>
+    
+    <!-- Channel list items -->
+    <rect x="18" y="58" width="124" height="18" rx="4" fill="#125649"/>
+    <rect x="25" y="64" width="55" height="6" rx="3" fill="#a3cfbb"/>
+    
+    <rect x="18" y="82" width="124" height="18" rx="4" fill="#125649"/>
+    <rect x="25" y="88" width="75" height="6" rx="3" fill="#a3cfbb"/>
+    
+    <rect x="18" y="106" width="124" height="18" rx="4" fill="#125649"/>
+    <rect x="25" y="112" width="60" height="6" rx="3" fill="#a3cfbb"/>
+
+    <!-- Content cards -->
+    <rect x="18" y="132" width="124" height="65" rx="6" fill="#0e5043" stroke="#1d6f5f" stroke-width="1"/>
+    <rect x="26" y="142" width="80" height="7" rx="3.5" fill="#ffffff"/>
+    <rect x="26" y="156" width="108" height="5" rx="2.5" fill="#a0d9cb"/>
+    <rect x="26" y="167" width="90" height="5" rx="2.5" fill="#a0d9cb" opacity="0.7"/>
+    <rect x="26" y="179" width="40" height="10" rx="5" fill="#00c996"/>
+
+    <rect x="18" y="205" width="124" height="70" rx="6" fill="#0e5043" stroke="#1d6f5f" stroke-width="1"/>
+    <rect x="26" y="215" width="70" height="7" rx="3.5" fill="#ffffff"/>
+    <rect x="26" y="228" width="100" height="5" rx="2.5" fill="#a0d9cb"/>
+    <rect x="26" y="239" width="85" height="5" rx="2.5" fill="#a0d9cb" opacity="0.7"/>
+  </g>
+
+  <!-- Notification Badges Floating on the right of phone -->
+  <g transform="translate(290, 140)" filter="url(#dropShadow)">
+    <circle cx="18" cy="18" r="18" fill="#d97706"/>
+    <path d="M18 10a5 5 0 0 0-5 5v3l-2 2v1h14v-1l-2-2v-3a5 5 0 0 0-5-5zm0 14a2 2 0 0 1-2-2h4a2 2 0 0 1-2 2z" fill="#ffffff"/>
+  </g>
+
+  <g transform="translate(295, 230)" filter="url(#dropShadow)">
+    <rect x="0" y="0" width="85" height="42" rx="8" fill="#1b5a4e" stroke="#257a6b" stroke-width="1.5"/>
+    <circle cx="16" cy="21" r="7" fill="#00c996"/>
+    <rect x="30" y="15" width="45" height="5" rx="2.5" fill="#ffffff"/>
+    <rect x="30" y="24" width="30" height="4" rx="2" fill="#a0d9cb"/>
+  </g>
+
+  <!-- Characters (Students) matching the SUAP illustration -->
+  <!-- Character 1: Girl touching the phone (Left) -->
+  <g transform="translate(245, 220)">
+    <!-- Legs -->
+    <path d="M45 130 L40 185 L52 187 L56 130 Z" fill="#1e293b"/>
+    <path d="M60 130 L65 185 L77 187 L71 130 Z" fill="#1e293b"/>
+    <!-- Shoes -->
+    <path d="M36 185 C36 185 45 182 53 189 C50 193 36 193 36 185 Z" fill="#00c996"/>
+    <path d="M63 185 C63 185 72 182 80 189 C77 193 63 193 63 185 Z" fill="#00c996"/>
+    <!-- Skirt / Pants -->
+    <path d="M38 105 L76 105 L72 135 L42 135 Z" fill="#1e3a8a"/>
+    <!-- Torso (Pink/Red shirt like in SUAP) -->
+    <path d="M35 55 C35 48 45 42 55 42 C65 42 75 48 75 55 L78 110 L32 110 Z" fill="#db2777"/>
+    <!-- Left Arm pointing to phone -->
+    <path d="M38 58 L5 48 L-2 56 L34 72 Z" fill="#fbcfe8"/>
+    <circle cx="-3" cy="52" r="5" fill="#fbcfe8"/>
+    <!-- Right Arm -->
+    <path d="M72 58 L85 95 L77 98 L67 65 Z" fill="#fbcfe8"/>
+    <!-- Neck -->
+    <rect x="51" y="32" width="9" height="12" fill="#fbcfe8"/>
+    <!-- Head -->
+    <ellipse cx="55.5" cy="24" rx="12" ry="14" fill="#fbcfe8"/>
+    <!-- Hair (long dark hair) -->
+    <path d="M42 22 C42 10 52 6 64 8 C72 10 73 20 73 28 C73 42 68 56 68 56 C68 56 58 46 58 35 C58 35 46 45 42 22 Z" fill="#1e1b18"/>
+  </g>
+
+  <!-- Character 2: Boy with Green Shirt (Middle) -->
+  <g transform="translate(340, 200)">
+    <!-- Legs (Blue jeans) -->
+    <path d="M42 140 L38 205 L52 207 L56 140 Z" fill="#1e3a8a"/>
+    <path d="M60 140 L64 205 L78 207 L72 140 Z" fill="#1e3a8a"/>
+    <!-- Shoes -->
+    <path d="M34 205 C34 205 45 202 54 209 C50 214 34 214 34 205 Z" fill="#0f172a"/>
+    <path d="M62 205 C62 205 73 202 82 209 C78 214 62 214 62 205 Z" fill="#0f172a"/>
+    <!-- Belt -->
+    <rect x="38" y="136" width="38" height="6" fill="#0f172a"/>
+    <!-- Shirt (Green Polo like in SUAP) -->
+    <path d="M32 60 C32 50 44 45 56 45 C68 45 80 50 80 60 L80 138 L32 138 Z" fill="#15803d"/>
+    <!-- Collar & sleeves -->
+    <polygon points="56,58 48,47 64,47" fill="#ffffff"/>
+    <!-- Arms -->
+    <path d="M33 63 L22 110 L30 112 L40 75 Z" fill="#fed7aa"/>
+    <path d="M78 63 L89 110 L81 112 L71 75 Z" fill="#fed7aa"/>
+    <!-- Hands -->
+    <circle cx="21" cy="112" r="5" fill="#fed7aa"/>
+    <circle cx="89" cy="112" r="5" fill="#fed7aa"/>
+    <!-- Neck -->
+    <rect x="51" y="35" width="10" height="12" fill="#fed7aa"/>
+    <!-- Head -->
+    <ellipse cx="56" cy="25" rx="13" ry="15" fill="#fed7aa"/>
+    <!-- Short Hair -->
+    <path d="M43 22 C43 12 50 8 60 8 C69 8 70 14 70 20 C64 16 52 17 48 24 Z" fill="#1c1917"/>
+  </g>
+
+  <!-- Character 3: Girl with Purple/Lilac Shirt (Right) -->
+  <g transform="translate(425, 205)">
+    <!-- Legs (Navy Pants) -->
+    <path d="M44 135 L40 200 L54 202 L57 135 Z" fill="#1e293b"/>
+    <path d="M61 135 L65 200 L79 202 L74 135 Z" fill="#1e293b"/>
+    <!-- Shoes -->
+    <path d="M35 200 C35 200 46 197 55 204 C51 209 35 209 35 200 Z" fill="#db2777"/>
+    <path d="M63 200 C63 200 74 197 83 204 C79 209 63 209 63 200 Z" fill="#db2777"/>
+    <!-- Pants Top -->
+    <rect x="40" y="130" width="37" height="10" fill="#1e293b"/>
+    <!-- Lilac Shirt -->
+    <path d="M35 60 C35 52 46 45 57 45 C68 45 78 52 78 60 L78 132 L35 132 Z" fill="#a855f7"/>
+    <!-- Arms -->
+    <path d="M35 62 L22 105 L30 108 L40 75 Z" fill="#fcd34d"/>
+    <path d="M78 62 L88 105 L80 108 L72 75 Z" fill="#fcd34d"/>
+    <!-- Neck -->
+    <rect x="52" y="36" width="9" height="11" fill="#fcd34d"/>
+    <!-- Head -->
+    <ellipse cx="56.5" cy="26" rx="12" ry="14" fill="#fcd34d"/>
+    <!-- Bob Hair Cut -->
+    <path d="M43 25 C43 14 50 10 62 10 C72 10 73 18 73 28 C73 34 71 40 70 42 C68 35 64 32 64 32 C64 32 50 32 46 42 C44 38 43 32 43 25 Z" fill="#451a03"/>
+  </g>
+</svg>

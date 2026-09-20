@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - ClassHub | IFSULDEMINAS</title>
+  
+  <!-- Bootstrap 5 & Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- Estilos Customizados (Inspirado no SUAP) -->
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-container">
+      
+      <!-- Coluna da Esquerda: Marca e Ilustração Institucional -->
+      <section class="auth-brand-side">
+        <header class="brand-header">
+          <a href="login.html" class="brand-logo-text">class<span>hub</span></a>
+          <div class="brand-divider"></div>
+          <div class="brand-institution">
+            <span class="institution-title">INSTITUTO FEDERAL</span>
+            <span class="institution-subtitle">Sul de Minas Gerais</span>
+          </div>
+        </header>
+
+        <div class="brand-hero">
+          <p class="brand-slogan">
+            Crie sua conta para acessar canais, materiais acadêmicos e tópicos de discussão.
+          </p>
+          <img src="assets/illustration.svg" alt="Comunidade Acadêmica IFSULDEMINAS" class="brand-illustration">
+        </div>
+
+        <footer class="brand-footer">
+          Sistemas Distribuídos &bull; IFSULDEMINAS – Campus Poços de Caldas
+        </footer>
+      </section>
+
+      <!-- Coluna da Direita: Card de Cadastro -->
+      <main class="auth-form-side">
+        <div class="auth-card-content">
+          
+          <div class="auth-header">
+            <h1 class="auth-title">Cadastro</h1>
+          </div>
+
+          <!-- Alerta Visual de Erro/Sucesso -->
+          <div id="auth-alert" class="suap-alert" role="alert"></div>
+
+          <!-- Formulário de Cadastro -->
+          <form id="cadastro-form" novalidate>
+            <!-- Nome Completo -->
+            <div class="form-group-suap">
+              <label for="name" class="form-label-suap">
+                <i class="bi bi-person-fill"></i> Nome Completo:
+              </label>
+              <input 
+                type="text" 
+                id="name" 
+                name="name" 
+                class="form-control-suap" 
+                placeholder="Ex: Caio Henrique"
+                autocomplete="name"
+                required
+              >
+              <div id="name-feedback" class="invalid-feedback-suap"></div>
+            </div>
+
+            <!-- Nome de Usuário -->
+            <div class="form-group-suap">
+              <label for="username" class="form-label-suap">
+                <i class="bi bi-at"></i> Nome de Usuário:
+              </label>
+              <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                class="form-control-suap" 
+                placeholder="ex: caioprinc"
+                autocomplete="username"
+                required
+              >
+              <div id="username-feedback" class="invalid-feedback-suap"></div>
+            </div>
+
+            <!-- E-mail -->
+            <div class="form-group-suap">
+              <label for="email" class="form-label-suap">
+                <i class="bi bi-envelope-fill"></i> E-mail:
+              </label>
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                class="form-control-suap" 
+                placeholder="caio@email.com"
+                autocomplete="email"
+                required
+              >
+              <div id="email-feedback" class="invalid-feedback-suap"></div>
+            </div>
+
+            <!-- Senha -->
+            <div class="form-group-suap">
+              <label for="password" class="form-label-suap">
+                <i class="bi bi-shield-lock-fill"></i> Senha (mín. 8 caracteres):
+              </label>
+              <div class="password-wrapper">
+                <input 
+                  type="password" 
+                  id="password" 
+                  name="password" 
+                  class="form-control-suap" 
+                  placeholder="Mínimo de 8 caracteres"
+                  autocomplete="new-password"
+                  required
+                >
+                <button type="button" id="toggle-password" class="password-toggle-btn" aria-label="Mostrar ou ocultar senha">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+              <div id="password-feedback" class="invalid-feedback-suap"></div>
+            </div>
+
+            <!-- Confirmar Senha -->
+            <div class="form-group-suap">
+              <label for="confirm-password" class="form-label-suap">
+                <i class="bi bi-check2-circle"></i> Confirmar Senha:
+              </label>
+              <div class="password-wrapper">
+                <input 
+                  type="password" 
+                  id="confirm-password" 
+                  name="confirm-password" 
+                  class="form-control-suap" 
+                  placeholder="Repita sua senha"
+                  autocomplete="new-password"
+                  required
+                >
+                <button type="button" id="toggle-confirm-password" class="password-toggle-btn" aria-label="Mostrar ou ocultar senha">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+              <div id="confirm-password-feedback" class="invalid-feedback-suap"></div>
+            </div>
+
+            <!-- Botão de Cadastro -->
+            <button type="submit" id="btn-submit" class="btn-suap-primary">
+              Cadastrar
+            </button>
+
+            <!-- Rodapé do Card: Retornar ao Login -->
+            <div class="auth-card-footer">
+              Já possui uma conta cadastrada?
+              <a href="login.html" class="link-suap">
+                Acesse o ClassHub com suas credenciais
+              </a>
+            </div>
+          </form>
+
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/cadastro.js"></script>
+</body>
+</html>
