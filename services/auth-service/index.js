@@ -8,9 +8,18 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 8081;
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
-const pool = new Pool({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
+
+const poolPrimary = new Pool({
+    host: process.env.DB_PRIMARY_HOST || process.env.DB_HOST || 'postgres-primary',
+    port: process.env.DB_PRIMARY_PORT || process.env.DB_PORT || 5432,
+    database: process.env.DB_NAME || 'communication',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres'
+});
+
+const poolReplica = new Pool({
+    host: process.env.DB_REPLICA_HOST || 'postgres-replica',
+    port: process.env.DB_REPLICA_PORT || process.env.DB_PORT || 5432,
     database: process.env.DB_NAME || 'communication',
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres'
@@ -69,7 +78,7 @@ async function check(req, res) {
     }
 
     // 3. Altera a consulta SQL para buscar pela coluna username
-    const result = await pool.query(
+    const result = await poolReplica.query(
         'SELECT id, name, username, email, password_hash FROM users WHERE username = $1',
         [username]
     );
@@ -95,7 +104,7 @@ async function createUser(req, res) {
     }
 
     try {
-        const result = await pool.query(
+        const result = await poolPrimary.query(
             `INSERT INTO users (name, username, email, password_hash)
              VALUES ($1, $2, $3, $4)
              RETURNING id, name, username, email`,
@@ -122,7 +131,7 @@ async function resetUserPassword(req, res) {
         });
     }
 
-    const result = await pool.query(
+    const result = await poolPrimary.query(
         `UPDATE users SET password_hash = $1, updated_at = NOW()
          WHERE email = $2 RETURNING id, name, username, email`,
         [hashPassword(passwordToStore), email]
@@ -145,7 +154,7 @@ async function recoverPassword(req, res) {
         });
     }
 
-    const result = await pool.query(
+    const result = await poolReplica.query(
         'SELECT id, name, username, email FROM users WHERE email = $1',
         [email]
     );

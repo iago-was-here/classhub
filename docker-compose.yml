@@ -1,0 +1,149 @@
+version: "3.9"
+
+services:
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      API_URL: http://gateway:8080
+    depends_on:
+      - gateway
+
+  gateway:
+    build:
+      context: ./gateway
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./gateway:/app
+      - /app/node_modules
+    environment:
+      AUTH_SERVICE: http://auth-service:8081
+      MESSAGE_SERVICE: http://message-service:8082
+      JWT_SECRET: secret
+    depends_on:
+      - auth-service
+      - message-service
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./services/auth-service:/app
+      - /app/node_modules
+    environment:
+      DB_PRIMARY_HOST: postgres-primary
+      DB_REPLICA_HOST: postgres-replica
+      DB_HOST: postgres-primary
+      DB_PORT: 5432
+      DB_NAME: communication
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: secret
+    depends_on:
+      - postgres-primary
+      - postgres-replica
+
+  message-service:
+    build:
+      context: ./services/message-service
+    container_name: message-service
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./services/message-service:/app
+      - /app/node_modules
+    environment:
+      DB_HOST: postgres-primary
+      DB_PORT: 5432
+      DB_NAME: communication
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+
+    depends_on:
+      - postgres-primary
+      - rabbitmq
+
+  notification-service:
+    build:
+      context: ./services/notificaton-service
+    container_name: notification-service
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./services/notificaton-service:/app
+      - /app/node_modules
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+    depends_on:
+      rabbitmq:
+        condition: service_started
+
+  postgres-primary:
+    image: bitnami/postgresql:latest
+    container_name: postgres-primary
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRESQL_REPLICATION_MODE: master
+      POSTGRESQL_REPLICATION_USER: repl_user
+      POSTGRESQL_REPLICATION_PASSWORD: repl_password
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: postgres
+      POSTGRESQL_POSTGRES_PASSWORD: postgres
+      POSTGRESQL_DATABASE: communication
+    volumes:
+      - postgres_primary_data:/bitnami/postgresql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  postgres-replica:
+    image: bitnami/postgresql:latest
+    container_name: postgres-replica
+    restart: always
+    ports:
+      - "5433:5432"
+    depends_on:
+      - postgres-primary
+    environment:
+      POSTGRESQL_REPLICATION_MODE: slave
+      POSTGRESQL_REPLICATION_USER: repl_user
+      POSTGRESQL_REPLICATION_PASSWORD: repl_password
+      POSTGRESQL_MASTER_HOST: postgres-primary
+      POSTGRESQL_MASTER_PORT_NUMBER: 5432
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: postgres
+      POSTGRESQL_POSTGRES_PASSWORD: postgres
+      POSTGRESQL_DATABASE: communication
+    volumes:
+      - postgres_replica_data:/bitnami/postgresql
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+volumes:
+  postgres_primary_data:
+  postgres_replica_data:
