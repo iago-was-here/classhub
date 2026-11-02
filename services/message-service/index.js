@@ -1,51 +1,51 @@
-const express = require('express');
-const cors = require('cors');
+const fs = require('node:fs/promises');
+const path = require('node:path');
+const { Pool } = require('pg');
+const { createApp } = require('./src/app');
+const { createAuthClient } = require('./src/auth-client');
+const { createMessageStore } = require('./src/message-store');
+const { startOutboxPublisher } = require('./src/outbox-publisher');
 
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-
-const PORT = process.env.PORT || 8082;
-
-const AUTH_SERVICE_URL = process.env.AUTH_URL || 'http://localhost:8081/api/auth/validate';
-
-app.post('/api/messages', async (req, res) => {
-    const { text, token } = req.body;
-
-    try {
-        console.log(`[Message Service] Validando token com o Auth Service...`);
-        
-        // 1. COMUNICAÇÃO REST: Chamando o Auth Service
-        const authResponse = await fetch(AUTH_SERVICE_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: token })
-        });
-
-        const authData = await authResponse.json();
-
-        // 2. Lógica de negócio baseada na resposta
-        if (authResponse.ok && authData.valid) {
-            console.log(`[Message Service] Mensagem aceita do usuário: ${authData.user}`);
-            // Aqui futuramente entra a integração com RabbitMQ e PostgreSQL
-            return res.status(201).json({ 
-                success: true, 
-                message: "Mensagem salva e processada!", 
-                author: authData.user,
-                text: text
-            });
-        } else {
-            console.log(`[Message Service] Mensagem recusada.`);
-            return res.status(401).json({ success: false, error: "Usuário não autorizado" });
-        }
-
-    } catch (error) {
-        console.error(`[Message Service] Erro ao comunicar com Auth Service:`, error.message);
-        return res.status(500).json({ success: false, error: "Falha na comunicação interna dos serviços" });
-    }
+const PORT = Number(process.env.PORT || 8082);
+const pool = new Pool({
+    host: process.env.DB_HOST || 'localhost',
+    port: Number(process.env.DB_PORT || 5432),
+    database: process.env.DB_NAME || 'communication',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres',
+    max: Number(process.env.DB_POOL_MAX || 10),
+    connectionTimeoutMillis: 5000
 });
 
-app.listen(PORT, () => {
-    console.log(`Message Service rodando na porta ${PORT}`);
+async function start() {
+    const migrationPath = path.join(__dirname, 'migrations', '001_messages.sql');
+    await pool.query(await fs.readFile(migrationPath, 'utf8'));
+
+    const app = createApp({
+        authClient: createAuthClient({
+            url: process.env.AUTH_URL || 'http://localhost:8081/api/auth/validate'
+        }),
+        messageStore: createMessageStore(pool)
+    });
+    const server = app.listen(PORT, () => {
+        console.log(`Message Service rodando na porta ${PORT}`);
+    });
+    const stopPublisher = startOutboxPublisher(pool, {
+        url: process.env.RABBITMQ_URL || `amqp://${process.env.RABBITMQ_USER || 'guest'}:${process.env.RABBITMQ_PASSWORD || 'guest'}@${process.env.RABBITMQ_HOST || 'localhost'}:${process.env.RABBITMQ_PORT || 5672}`
+    });
+
+    async function shutdown() {
+        server.close();
+        await stopPublisher();
+        await pool.end();
+    }
+
+    process.once('SIGINT', shutdown);
+    process.once('SIGTERM', shutdown);
+}
+
+start().catch(async (error) => {
+    console.error('[Message Service] Falha ao iniciar:', error.message);
+    await pool.end();
+    process.exitCode = 1;
 });

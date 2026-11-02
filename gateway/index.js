@@ -14,7 +14,7 @@ app.use((req, res, next) => {
 });
 
 const messagesProxy = createProxyMiddleware({ 
-    target: 'http://localhost:8082', 
+    target: process.env.MESSAGE_SERVICE || 'http://localhost:8082', 
     changeOrigin: true 
 });
 

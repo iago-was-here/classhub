@@ -40,6 +40,22 @@ O sistema é composto pelos seguintes componentes:
 * WebSocket
 * REST API
 
+## API de Mensagens
+
+As rotas são disponibilizadas pelo Gateway em `http://localhost:8080` e exigem um JWT válido no cabeçalho `Authorization: Bearer <token>`. Para compatibilidade, o envio também aceita `token` no corpo JSON.
+
+* `POST /api/messages` — recebe `{ "text": "..." }` e retorna a mensagem persistida.
+* `GET /api/messages?limit=50&before=<ISO-8601>` — lista mensagens em ordem cronológica, com limite máximo de 100 por página.
+* `GET /health` — verifica a disponibilidade do PostgreSQL no serviço.
+
+O envio grava a mensagem e um evento na outbox em uma única transação. Um worker publica eventos confirmados na fila durável `classhub.messages` do RabbitMQ, com retentativas em caso de indisponibilidade.
+
+Os testes do serviço podem ser executados sem Node.js instalado no host:
+
+```sh
+docker compose -f docker-compose-dev.yml run --rm --build --no-deps message-service npm test
+```
+
 ## Conceitos de Sistemas Distribuídos Aplicados
 
 * Arquitetura de Microsserviços
