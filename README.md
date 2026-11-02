@@ -56,6 +56,16 @@ Os testes do serviço podem ser executados sem Node.js instalado no host:
 docker compose -f docker-compose-dev.yml run --rm --build --no-deps message-service npm test
 ```
 
+## Notificações em Tempo Real
+
+O serviço consome os eventos `message.created` da fila `classhub.messages` e os transmite aos clientes conectados por WebSocket. A conexão fica disponível em `ws://localhost:8083/ws?token=<jwt>`; o token é validado pelo Auth Service e as origens permitidas são configuradas em `WS_ALLOWED_ORIGINS`. Como o modelo atual de mensagens não define canais ou destinatários, os eventos são transmitidos a todos os clientes autenticados conectados. Clientes desconectados podem consultar o histórico pela API de mensagens.
+
+Os testes também rodam no container, sem instalar dependências no host:
+
+```sh
+docker compose -f docker-compose-dev.yml run --rm --build --no-deps notification-service npm test
+```
+
 ## Conceitos de Sistemas Distribuídos Aplicados
 
 * Arquitetura de Microsserviços

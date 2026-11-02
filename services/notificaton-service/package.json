@@ -4,6 +4,11 @@
   "description": "Serviço de notificações do ClassHub",
   "main": "index.js",
   "scripts": {
-    "dev": "node index.js"
+    "dev": "node index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.8",
+    "ws": "^8.18.3"
   }
 }
