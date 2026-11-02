@@ -78,6 +78,11 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8082/health').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   notification-service:
     build:
@@ -89,6 +94,11 @@ services:
       - ./services/notificaton-service:/app
       - /app/node_modules
     environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: communication
+      DB_USER: postgres
+      DB_PASSWORD: postgres
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
       AUTH_URL: http://auth-service:8081/api/auth/validate
@@ -96,7 +106,11 @@ services:
     depends_on:
       auth-service:
         condition: service_started
+      message-service:
+        condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8083/health').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"]

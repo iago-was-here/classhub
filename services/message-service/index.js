@@ -18,8 +18,14 @@ const pool = new Pool({
 });
 
 async function start() {
-    const migrationPath = path.join(__dirname, 'migrations', '001_messages.sql');
-    await pool.query(await fs.readFile(migrationPath, 'utf8'));
+    const migrationsPath = path.join(__dirname, 'migrations');
+    const migrationFiles = (await fs.readdir(migrationsPath))
+        .filter((file) => file.endsWith('.sql'))
+        .sort();
+    for (const migrationFile of migrationFiles) {
+        const migration = await fs.readFile(path.join(migrationsPath, migrationFile), 'utf8');
+        await pool.query(migration);
+    }
 
     const app = createApp({
         authClient: createAuthClient({

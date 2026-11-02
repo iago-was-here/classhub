@@ -259,35 +259,12 @@
         window.location.href = 'login.html';
       });
 
-      // 4. Gerenciamento de Canais de Disciplina (com persistência em LocalStorage)
-      const defaultChannels = [
-        { id: 'sistemas-distribuidos', name: 'Sistemas Distribuídos', desc: 'Canal oficial de discussões, microsserviços e mensageria distribuída.' },
-        { id: 'banco-de-dados', name: 'Banco de Dados', desc: 'Modelagem relacional, SQL, PostgreSQL e otimização de consultas.' },
-        { id: 'redes-computadores', name: 'Redes de Computadores', desc: 'Protocolos TCP/IP, roteamento, camadas OSI e segurança de rede.' },
-        { id: 'inteligencia-artificial', name: 'Inteligência Artificial', desc: 'Algoritmos de busca, aprendizado de máquina e redes neurais.' }
-      ];
-
-      function getChannels() {
-        try {
-          const stored = localStorage.getItem('classhub_custom_channels');
-          if (stored) {
-            return [...defaultChannels, ...JSON.parse(stored)];
-          }
-        } catch (e) {}
-        return defaultChannels;
-      }
-
-      function saveCustomChannel(newChannel) {
-        try {
-          const stored = JSON.parse(localStorage.getItem('classhub_custom_channels') || '[]');
-          stored.push(newChannel);
-          localStorage.setItem('classhub_custom_channels', JSON.stringify(stored));
-        } catch (e) {
-          console.error('Erro ao salvar canal:', e);
-        }
-      }
-
-      let activeChannel = getChannels()[0];
+      // 4. Canais persistidos e inscrições do usuário
+      let channels = [];
+      let activeChannel = null;
+      let notificationSocket;
+      let notificationRetry;
+      const renderedMessageIds = new Set();
       const channelListEl = document.getElementById('channel-list');
       const activeTitleEl = document.getElementById('active-channel-title');
       const activeDescEl = document.getElementById('active-channel-desc');
@@ -297,43 +274,128 @@
       const messagesContainer = document.getElementById('messages-container');
       const messagesStream = document.getElementById('messages-stream');
 
-      function renderChannels(filterText = '') {
-        const channels = getChannels();
-        channelListEl.innerHTML = '';
+      async function apiRequest(path, options = {}) {
+        const response = await fetch(`${CONFIG.GATEWAY_URL}${path}`, {
+          ...options,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            ...(options.headers || {})
+          }
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || 'Não foi possível concluir a operação.');
+        return data;
+      }
 
+      function renderChannels(filterText = '') {
+        channelListEl.replaceChildren();
         channels
-          .filter(c => c.name.toLowerCase().includes(filterText.toLowerCase()))
+          .filter(channel => channel.name.toLowerCase().includes(filterText.toLowerCase()))
           .forEach(channel => {
-            const li = document.createElement('li');
-            li.className = `channel-item ${channel.id === activeChannel.id ? 'active' : ''}`;
-            li.innerHTML = `
-              <div class="channel-title-wrap">
-                <span class="channel-hash">#</span>
-                <span>${channel.name}</span>
-              </div>
-            `;
-            li.addEventListener('click', () => {
-              selectChannel(channel);
+            const item = document.createElement('li');
+            item.className = `channel-item ${channel.id === activeChannel?.id ? 'active' : ''}`;
+            item.innerHTML = '<div class="channel-title-wrap"><span class="channel-hash">#</span><span class="channel-name"></span></div><small class="channel-membership"></small>';
+            item.querySelector('.channel-name').textContent = channel.name;
+            item.querySelector('.channel-membership').textContent = channel.isMember
+              ? `${channel.memberCount} membro(s)`
+              : 'Inscrever-se';
+            item.addEventListener('click', () => {
+              selectChannel(channel).catch(showOperationError);
               closeSidebarMobile();
             });
-            channelListEl.appendChild(li);
+            channelListEl.appendChild(item);
           });
       }
 
-      function selectChannel(channel) {
+      async function loadChannels() {
+        const data = await apiRequest('/api/channels');
+        channels = data.channels;
+        renderChannels(searchInput.value);
+        const currentChannel = channels.find(channel => channel.id === activeChannel?.id && channel.isMember);
+        const firstMembership = channels.find(channel => channel.isMember);
+        if (currentChannel || firstMembership) {
+          await selectChannel(currentChannel || firstMembership);
+          return;
+        }
+
+        activeChannel = null;
+        activeTitleEl.textContent = 'Selecione ou crie um canal';
+        activeDescEl.textContent = 'Inscreva-se em um canal para acompanhar as mensagens.';
+        welcomeTitleEl.textContent = 'Nenhum canal inscrito';
+        welcomeDescEl.textContent = 'Escolha um canal disponível ou crie um novo para começar.';
+        chatInput.disabled = true;
+        messagesContainer.replaceChildren();
+        renderedMessageIds.clear();
+      }
+
+      async function selectChannel(channel) {
+        if (!channel.isMember) {
+          await apiRequest(`/api/channels/${channel.id}/subscriptions`, { method: 'POST' });
+          channel.isMember = true;
+          channel.memberCount += 1;
+        }
         activeChannel = channel;
-        activeTitleEl.innerHTML = `<span>#</span> ${channel.name}`;
-        activeDescEl.textContent = channel.desc || `Discussões e tópicos de ${channel.name}.`;
+        activeTitleEl.textContent = `# ${channel.name}`;
+        activeDescEl.textContent = channel.description || `Discussões e tópicos de ${channel.name}.`;
         welcomeTitleEl.textContent = `Bem-vindo(a) ao canal #${channel.name}!`;
-        welcomeDescEl.textContent = channel.desc || `Espaço para compartilhamento e dúvidas de ${channel.name}.`;
+        welcomeDescEl.textContent = channel.description || `Espaço para compartilhamento e dúvidas de ${channel.name}.`;
         chatInput.placeholder = `Envie uma mensagem para a turma de ${channel.name}...`;
+        chatInput.disabled = false;
         renderChannels();
-        
-        // Mensagem de sistema ao trocar de canal
+        await loadChannelMessages(channel.id);
+      }
+
+      async function loadChannelMessages(channelId) {
+        messagesContainer.replaceChildren();
+        renderedMessageIds.clear();
+        const data = await apiRequest(`/api/channels/${channelId}/messages`);
+        data.messages.forEach(message => appendMessage({
+          id: message.id,
+          name: message.author || message.authorId,
+          username: message.author ? `@${message.author}` : '',
+          text: message.text,
+          time: formatMessageTime(message.createdAt),
+          isOwn: message.authorId === user?.id
+        }));
+      }
+
+      function formatMessageTime(value) {
+        return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+
+      function connectNotifications() {
+        const url = new URL(`${CONFIG.NOTIFICATION_URL}/ws`);
+        url.searchParams.set('token', token);
+        notificationSocket = new WebSocket(url);
+        notificationSocket.addEventListener('message', event => {
+          let notification;
+          try {
+            notification = JSON.parse(event.data);
+          } catch (error) {
+            return;
+          }
+          if (notification.type !== 'message.created' || notification.data.channelId !== activeChannel?.id) return;
+          appendMessage({
+            id: notification.data.id,
+            name: notification.data.author || notification.data.authorId,
+            username: notification.data.author ? `@${notification.data.author}` : '',
+            text: notification.data.text,
+            time: formatMessageTime(notification.data.createdAt),
+            isOwn: notification.data.authorId === user?.id
+          });
+        });
+        notificationSocket.addEventListener('close', () => {
+          if (token) notificationRetry = setTimeout(connectNotifications, 3000);
+        });
+      }
+
+      function showOperationError(error) {
+        console.error('[ClassHub] Operação falhou:', error);
         appendMessage({
           name: 'ClassHub',
           username: '@sistema',
-          text: `Você entrou no canal #${channel.name}.`,
+          text: error.message,
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           isSystem: true
         });
@@ -348,87 +410,53 @@
       // Tópicos Recentes
       document.querySelectorAll('#recent-list .channel-item').forEach(item => {
         item.addEventListener('click', () => {
-          const topic = item.dataset.topic;
-          selectChannel({
-            id: topic.toLowerCase().replace(/\s+/g, '-'),
-            name: topic,
-            desc: `Discussão do grupo acadêmico sobre ${topic}.`
-          });
-          closeSidebarMobile();
+          searchInput.value = item.dataset.topic;
+          renderChannels(searchInput.value);
         });
       });
 
       // 5. Mensageria e Envio de Mensagens
-      function appendMessage({ name, username, text, time, isOwn = false, isSystem = false }) {
+      function appendMessage({ id, name, username, text, time, isOwn = false, isSystem = false }) {
+        if (id && renderedMessageIds.has(id)) return;
+        if (id) renderedMessageIds.add(id);
         const row = document.createElement('div');
         row.className = `chat-msg-row ${isOwn ? 'msg-own' : ''} ${isSystem ? 'msg-system' : ''}`;
 
         const initials = (name || 'U').split(' ').map(n => n[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
-
-        row.innerHTML = `
-          <div class="msg-avatar">${initials}</div>
-          <div class="msg-body-wrapper">
-            <div class="msg-meta">
-              <span class="msg-author-name">${name}</span>
-              <span class="msg-author-username">${username}</span>
-              <span class="msg-time">&bull; ${time}</span>
-            </div>
-            <div class="msg-bubble">${escapeHtml(text)}</div>
-          </div>
-        `;
+        row.innerHTML = '<div class="msg-avatar"></div><div class="msg-body-wrapper"><div class="msg-meta"><span class="msg-author-name"></span><span class="msg-author-username"></span><span class="msg-time"></span></div><div class="msg-bubble"></div></div>';
+        row.querySelector('.msg-avatar').textContent = initials;
+        row.querySelector('.msg-author-name').textContent = name || 'Usuário';
+        row.querySelector('.msg-author-username').textContent = username || '';
+        row.querySelector('.msg-time').textContent = `• ${time}`;
+        row.querySelector('.msg-bubble').textContent = text;
 
         messagesContainer.appendChild(row);
         messagesStream.scrollTop = messagesStream.scrollHeight;
       }
 
-      function escapeHtml(str) {
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
-      }
-
       async function publishMessage() {
         const text = chatInput.value.trim();
-        if (!text) return;
+        if (!text || !activeChannel) return;
 
         chatInput.value = '';
-        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        // Renderiza mensagem enviada pelo usuário logado
-        appendMessage({
-          name: displayName,
-          username: displayUsername,
-          text: text,
-          time: now,
-          isOwn: true
-        });
 
         try {
-          const response = await fetch(`${CONFIG.GATEWAY_URL}/api/messages`, {
+          const data = await apiRequest(`/api/channels/${activeChannel.id}/messages`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              text: `[#${activeChannel.name}] ${text}`, 
-              token: token 
-            })
+            body: JSON.stringify({ text })
           });
-
-          const data = await response.json().catch(() => ({}));
-
-          if (response.ok && data.success) {
-            // Confirmação sutil do microserviço
-            console.log('[Message Service] Mensagem persistida e processada:', data);
-          } else {
-            appendMessage({
-              name: 'Sistema',
-              username: '@gateway',
-              text: `Aviso do Gateway: ${data.error || 'Mensagem não processada pelo serviço de mensagens.'}`,
-              time: now,
-              isSystem: true
-            });
-          }
+          const message = data.message;
+          appendMessage({
+            id: message.id,
+            name: message.author || displayName,
+            username: message.author ? `@${message.author}` : displayUsername,
+            text: message.text,
+            time: formatMessageTime(message.createdAt),
+            isOwn: true
+          });
         } catch (error) {
-          console.warn('[Message Service] Não foi possível conectar ao Gateway na porta 8080:', error);
+          chatInput.value = text;
+          showOperationError(error);
         }
       }
 
@@ -469,7 +497,7 @@
         if (e.target === modalBackdrop) closeModal();
       });
 
-      submitModalBtn.addEventListener('click', (e) => {
+      submitModalBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         const name = channelNameInput.value.trim();
         const desc = channelDescInput.value.trim();
@@ -479,13 +507,21 @@
           return;
         }
 
-        const id = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '-');
-        const newChan = { id, name, desc: desc || `Canal acadêmico de ${name}` };
-
-        saveCustomChannel(newChan);
-        closeModal();
-        renderChannels();
-        selectChannel(newChan);
+        submitModalBtn.disabled = true;
+        try {
+          const data = await apiRequest('/api/channels', {
+            method: 'POST',
+            body: JSON.stringify({ name, description: desc })
+          });
+          channels.push(data.channel);
+          closeModal();
+          renderChannels();
+          await selectChannel(data.channel);
+        } catch (error) {
+          showOperationError(error);
+        } finally {
+          submitModalBtn.disabled = false;
+        }
       });
 
       // 7. Responsividade da Sidebar no Mobile
@@ -509,8 +545,12 @@
       sidebarBackdrop.addEventListener('click', closeSidebarMobile);
 
       // Renderização inicial
-      renderChannels();
-      selectChannel(activeChannel);
+      connectNotifications();
+      loadChannels().catch(showOperationError);
+      window.addEventListener('beforeunload', () => {
+        clearTimeout(notificationRetry);
+        notificationSocket?.close();
+      });
     });
   </script>
 </body>

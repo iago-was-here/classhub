@@ -5,6 +5,7 @@
 const CONFIG = {
   // Endpoints configurados para comunicação direta com o API Gateway (porta 8080)
   GATEWAY_URL: 'http://localhost:8080',
+  NOTIFICATION_URL: 'ws://localhost:8083',
   ENDPOINTS: {
     CHECK: 'http://localhost:8080/api/auth/check',
     CREATE_USER: 'http://localhost:8080/api/auth/create_user',

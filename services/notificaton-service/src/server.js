@@ -9,14 +9,21 @@ function sendUpgradeError(socket, status, message) {
     socket.destroy();
 }
 
-function createNotificationServer({ authClient, allowedOrigins = [], heartbeatIntervalMs = 30000 }) {
+function createNotificationServer({ authClient, notificationStore, allowedOrigins = [], heartbeatIntervalMs = 30000 }) {
     let brokerReady = false;
-    const server = http.createServer((req, res) => {
+    const server = http.createServer(async (req, res) => {
         if (req.method === 'GET' && req.url === '/health') {
-            const status = brokerReady ? 200 : 503;
+            let databaseReady = true;
+            try {
+                await notificationStore.healthCheck();
+            } catch (error) {
+                databaseReady = false;
+            }
+            const ready = brokerReady && databaseReady;
+            const status = ready ? 200 : 503;
             res.writeHead(status, { 'Content-Type': 'application/json' });
             return res.end(JSON.stringify({
-                status: brokerReady ? 'ok' : 'unavailable',
+                status: ready ? 'ok' : 'unavailable',
                 connectedClients: websocketServer.clients.size
             }));
         }
@@ -84,10 +91,11 @@ function createNotificationServer({ authClient, allowedOrigins = [], heartbeatIn
     }, heartbeatIntervalMs);
     heartbeat.unref();
 
-    function broadcast(event) {
+    function broadcast(event, recipientIds) {
         const payload = JSON.stringify(event);
+        const recipients = new Set(recipientIds);
         for (const websocket of websocketServer.clients) {
-            if (websocket.readyState !== WebSocket.OPEN) continue;
+            if (websocket.readyState !== WebSocket.OPEN || !recipients.has(websocket.userId)) continue;
             if (websocket.bufferedAmount > MAX_BUFFERED_BYTES) {
                 websocket.close(1013, 'Cliente lento');
                 continue;

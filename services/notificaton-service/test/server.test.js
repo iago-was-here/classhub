@@ -11,10 +11,12 @@ before(async () => {
         authClient: {
             async validateToken(token) {
                 if (token === 'valid-token') return { id: 'user-123' };
+                if (token === 'other-token') return { id: 'user-456' };
                 if (token === 'auth-down') throw new Error('auth unavailable');
                 return null;
             }
         },
+        notificationStore: { async healthCheck() {} },
         allowedOrigins: ['http://localhost:3000']
     });
     service.setBrokerReady(true);
@@ -37,24 +39,33 @@ test('broadcasts events only to authenticated WebSocket clients', async () => {
     const websocket = new WebSocket(`${baseUrl.replace('http', 'ws')}/ws?token=valid-token`, {
         origin: 'http://localhost:3000'
     });
-    await new Promise((resolve, reject) => {
-        websocket.once('open', resolve);
-        websocket.once('error', reject);
+    const otherWebsocket = new WebSocket(`${baseUrl.replace('http', 'ws')}/ws?token=other-token`, {
+        origin: 'http://localhost:3000'
+    });
+    await Promise.all([websocket, otherWebsocket].map((client) => new Promise((resolve, reject) => {
+        client.once('open', resolve);
+        client.once('error', reject);
+    })));
+    const excluded = new Promise((resolve) => {
+        otherWebsocket.once('message', () => resolve(false));
+        setTimeout(() => resolve(true), 50);
     });
 
     const event = {
         eventId: 'event-123',
         type: 'message.created',
-        data: { id: 'message-123', text: 'Olá' }
+        data: { id: 'message-123', channelId: 'channel-123', text: 'Olá' }
     };
     const received = new Promise((resolve, reject) => {
         websocket.once('message', (payload) => resolve(JSON.parse(payload.toString())));
         websocket.once('error', reject);
     });
-    service.broadcast(event);
+    service.broadcast(event, ['user-123']);
 
     assert.deepEqual(await received, event);
+    assert.equal(await excluded, true);
     websocket.close();
+    otherWebsocket.close();
 });
 
 test('rejects invalid tokens, unavailable auth and untrusted origins', async () => {

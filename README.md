@@ -40,15 +40,21 @@ O sistema é composto pelos seguintes componentes:
 * WebSocket
 * REST API
 
-## API de Mensagens
+## Canais e Mensagens
 
-As rotas são disponibilizadas pelo Gateway em `http://localhost:8080` e exigem um JWT válido no cabeçalho `Authorization: Bearer <token>`. Para compatibilidade, o envio também aceita `token` no corpo JSON.
+As rotas são disponibilizadas pelo Gateway em `http://localhost:8080` e exigem um JWT válido no cabeçalho `Authorization: Bearer <token>`.
 
-* `POST /api/messages` — recebe `{ "text": "..." }` e retorna a mensagem persistida.
-* `GET /api/messages?limit=50&before=<ISO-8601>` — lista mensagens em ordem cronológica, com limite máximo de 100 por página.
+* `POST /api/channels` — cria `{ "name": "...", "description": "..." }`; o criador já fica inscrito.
+* `GET /api/channels` — lista canais disponíveis, contagem de membros e `isMember` para o usuário atual.
+* `POST /api/channels/:channelId/subscriptions` — inscreve o usuário no canal.
+* `DELETE /api/channels/:channelId/subscriptions` — remove a inscrição.
+* `POST /api/channels/:channelId/messages` — envia `{ "text": "..." }`; requer inscrição no canal.
+* `GET /api/channels/:channelId/messages?limit=50&before=<ISO-8601>` — consulta o histórico do canal; limite máximo de 100 por página.
 * `GET /health` — verifica a disponibilidade do PostgreSQL no serviço.
 
-O envio grava a mensagem e um evento na outbox em uma única transação. Um worker publica eventos confirmados na fila durável `classhub.messages` do RabbitMQ, com retentativas em caso de indisponibilidade.
+O envio grava a mensagem e um evento na outbox em uma única transação. O evento inclui o `channelId`, é publicado na fila durável `classhub.messages` e entregue por WebSocket apenas aos membros inscritos e conectados. A conexão usa `ws://localhost:8083/ws?token=<jwt>`; clientes desconectados podem consultar o histórico ao retornar. Mensagens antigas são migradas para o canal `Geral`.
+
+O frontend lista todos os canais, inscreve o usuário ao selecionar um canal disponível e cria canais pela mesma API.
 
 Os testes do serviço podem ser executados sem Node.js instalado no host:
 

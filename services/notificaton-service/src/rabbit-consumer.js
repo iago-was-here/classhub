@@ -12,6 +12,7 @@ function isMessageEvent(event) {
         typeof event.eventId === 'string' &&
         event.type === 'message.created' &&
         event.data &&
+        typeof event.data.channelId === 'string' &&
         typeof event.data.id === 'string' &&
         typeof event.data.authorId === 'string' &&
         typeof event.data.text === 'string'
@@ -51,6 +52,7 @@ function startRabbitConsumer({
             channel.ack(message);
         } catch (error) {
             console.error('[Notification Service] Falha ao distribuir evento:', error.message);
+            await delay(retryDelayMs);
             channel.nack(message, false, true);
         }
     }

@@ -58,7 +58,7 @@ test('acks a valid message event after delivery succeeds', async () => {
     const event = {
         eventId: 'event-1',
         type: 'message.created',
-        data: { id: 'message-1', authorId: 'user-1', text: 'Olá' }
+        data: { id: 'message-1', channelId: 'channel-1', authorId: 'user-1', text: 'Olá' }
     };
     const incoming = message(event);
     await broker.deliver(incoming);
@@ -73,7 +73,8 @@ test('discards malformed events and requeues delivery failures', async () => {
     const stop = startRabbitConsumer({
         url: 'amqp://test',
         connect: broker.connect,
-        onEvent: async () => { throw new Error('temporary failure'); }
+        onEvent: async () => { throw new Error('temporary failure'); },
+        retryDelayMs: 1
     });
     await broker.ready;
 
@@ -84,7 +85,7 @@ test('discards malformed events and requeues delivery failures', async () => {
     const valid = message({
         eventId: 'event-2',
         type: 'message.created',
-        data: { id: 'message-2', authorId: 'user-1', text: 'Olá' }
+        data: { id: 'message-2', channelId: 'channel-1', authorId: 'user-1', text: 'Olá' }
     });
     await broker.deliver(valid);
     assert.deepEqual(broker.requeues, [{ message: valid, allUpTo: false, requeue: true }]);
