@@ -13,26 +13,21 @@ app.use((req, res, next) => {
     next();
 });
 
-const messagesProxy = createProxyMiddleware({ 
-    target: 'http://localhost:8082', 
-    changeOrigin: true 
-});
-
-const authProxy = createProxyMiddleware({ 
-    target: 'http://auth-service:8081', 
-    changeOrigin: true 
-});
-
-// O próprio Gateway avalia a rota original e decide para qual proxy mandar
-app.use((req, res, next) => {
-    if (req.url.startsWith('/api/messages')) {
-        return messagesProxy(req, res, next);
+app.use('/api/auth', createProxyMiddleware({
+    target: 'http://localhost:8081',
+    changeOrigin: true,
+    pathRewrite: {
+        '^/': '/api/auth/' 
     }
-    if (req.url.startsWith('/api/auth')) {
-        return authProxy(req, res, next);
+}));
+
+app.use('/api/messages', createProxyMiddleware({
+    target: 'http://localhost:8082',
+    changeOrigin: true,
+    pathRewrite: {
+        '^/': '/api/messages/'
     }
-    next();
-});
+}));
 
 app.get('/', (req, res) => {
     res.send('O Gateway do Classhub está no ar!');
