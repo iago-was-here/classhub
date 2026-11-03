@@ -14,7 +14,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/auth', createProxyMiddleware({
-    target: 'http://localhost:8081',
+    target: 'http://auth-service:8081',
     changeOrigin: true,
     pathRewrite: {
         '^/': '/api/auth/' 
