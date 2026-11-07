@@ -180,13 +180,20 @@ app.post('/api/auth/recover_password', (req, res, next) => recoverPassword(req, 
 app.post('/api/auth/validate', (req, res) => {
     const { token } = req.body;
 
-    if (token) {
-        console.log(`[Auth Service] Token recebido: ${token} - Validação OK`);
-        return res.status(200).json({ valid: true, user: "aluno_teste" });
+    if (typeof token === 'string' && token) {
+        try {
+            const payload = jwt.verify(token, JWT_SECRET);
+            return res.status(200).json({
+                valid: true,
+                user: payload.email,
+                user_id: payload.sub
+            });
+        } catch (error) {
+            return res.status(401).json({ valid: false, error: 'Token inválido' });
+        }
     }
 
-    console.log(`[Auth Service] Requisição negada. Token ausente.`);
-    return res.status(401).json({ valid: false, error: "Não autorizado" });
+    return res.status(401).json({ valid: false, error: 'Não autorizado' });
 });
 
 app.listen(PORT, () => {

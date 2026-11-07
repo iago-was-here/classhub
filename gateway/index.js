@@ -14,7 +14,7 @@ app.use((req, res, next) => {
 });
 
 const messagesProxy = createProxyMiddleware({ 
-    target: 'http://localhost:8082', 
+    target: process.env.MESSAGE_SERVICE || 'http://localhost:8082', 
     changeOrigin: true 
 });
 
@@ -25,7 +25,7 @@ const authProxy = createProxyMiddleware({
 
 // O próprio Gateway avalia a rota original e decide para qual proxy mandar
 app.use((req, res, next) => {
-    if (req.url.startsWith('/api/messages')) {
+    if (req.url.startsWith('/api/messages') || req.url.startsWith('/api/channels')) {
         return messagesProxy(req, res, next);
     }
     if (req.url.startsWith('/api/auth')) {
