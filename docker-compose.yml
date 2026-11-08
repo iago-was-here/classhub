@@ -70,13 +70,13 @@ services:
       DB_NAME: communication
       DB_USER: postgres
       DB_PASSWORD: postgres
-
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
-
+      AUTH_URL: http://auth-service:8081/api/auth/validate
     depends_on:
       - postgres-primary
       - rabbitmq
+      - auth-service 
 
   notification-service:
     build:
@@ -88,11 +88,19 @@ services:
       - ./services/notificaton-service:/app
       - /app/node_modules
     environment:
+      DB_HOST: postgres-primary 
+      DB_PORT: 5432
+      DB_NAME: communication
+      DB_USER: postgres
+      DB_PASSWORD: postgres
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
+      AUTH_URL: http://auth-service:8081/api/auth/validate
+      WS_ALLOWED_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
     depends_on:
-      rabbitmq:
-        condition: service_started
+      - rabbitmq
+      - auth-service
+      - postgres-primary
 
   postgres-primary:
     image: bitnami/postgresql:latest
