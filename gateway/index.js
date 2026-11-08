@@ -7,35 +7,31 @@ const PORT = process.env.PORT || 8080;
 
 app.use(cors());
 
-// Log para provar que a requisição entrou na portaria
 app.use((req, res, next) => {
-    console.log(`[API Gateway] Requisição cruzando a portaria: ${req.method} ${req.url}`);
+    console.log(`[API Gateway] Requisição: ${req.method} ${req.url}`);
     next();
 });
 
-const messagesProxy = createProxyMiddleware({ 
-    target: process.env.MESSAGE_SERVICE || 'http://localhost:8082', 
-    changeOrigin: true 
-});
+const routes = {
+    '/api/auth': process.env.AUTH_SERVICE_URL || 'http://auth-service:8081',
+    '/api/messages': process.env.MESSAGE_SERVICE_URL || 'http://message-service:8082',
+    '/api/channels': process.env.MESSAGE_SERVICE_URL || 'http://message-service:8082'
+};
 
-const authProxy = createProxyMiddleware({ 
-    target: 'http://auth-service:8081', 
-    changeOrigin: true 
-});
+for (const [pathPrefix, targetUrl] of Object.entries(routes)) {
+    app.use(createProxyMiddleware({
+        pathFilter: pathPrefix,
+        target: targetUrl,
+        changeOrigin: true,
+        onError: (err, req, res) => {
+            console.error(`[Gateway Error] Falha ao rotear para ${targetUrl}:`, err.message);
+            res.status(503).json({ success: false, error: 'Serviço temporariamente indisponível' });
+        }
+    }));
+}
 
-// O próprio Gateway avalia a rota original e decide para qual proxy mandar
-app.use((req, res, next) => {
-    if (req.url.startsWith('/api/messages') || req.url.startsWith('/api/channels')) {
-        return messagesProxy(req, res, next);
-    }
-    if (req.url.startsWith('/api/auth')) {
-        return authProxy(req, res, next);
-    }
-    next();
-});
-
-app.get('/', (req, res) => {
-    res.send('O Gateway do Classhub está no ar!');
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'Gateway OK' });
 });
 
 app.listen(PORT, () => {
