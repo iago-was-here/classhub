@@ -130,7 +130,7 @@ function createMessageStore(pool) {
                 const eventId = randomUUID();
                 const event = {
                     eventId,
-                    type: 'message.created',
+                    type: 'message.created.v1',
                     occurredAt: message.created_at,
                     data: mapMessage(message)
                 };

@@ -1,6 +1,6 @@
 const amqp = require('amqplib');
 
-const QUEUE_NAME = 'classhub.messages';
+const QUEUE_NAME = 'notifications.message-created.v1';
 
 function delay(milliseconds) {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));

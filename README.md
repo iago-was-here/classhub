@@ -52,7 +52,7 @@ As rotas são disponibilizadas pelo Gateway em `http://localhost:8080` e exigem 
 * `GET /api/channels/:channelId/messages?limit=50&before=<ISO-8601>` — consulta o histórico do canal; limite máximo de 100 por página.
 * `GET /health` — verifica a disponibilidade do PostgreSQL no serviço.
 
-O envio grava a mensagem e um evento na outbox em uma única transação. O evento inclui o `channelId`, é publicado na fila durável `classhub.messages` e entregue por WebSocket apenas aos membros inscritos e conectados. A conexão usa `ws://localhost:8083/ws?token=<jwt>`; clientes desconectados podem consultar o histórico ao retornar. Mensagens antigas são migradas para o canal `Geral`.
+O envio grava a mensagem e um evento na outbox em uma única transação. O evento inclui o `channelId`, é publicado na fila durável `notifications.message-created.v1` e entregue por WebSocket apenas aos membros inscritos e conectados. A conexão usa `ws://localhost:8083/ws?token=<jwt>`; clientes desconectados podem consultar o histórico ao retornar. Mensagens antigas são migradas para o canal `Geral`.
 
 O frontend lista todos os canais, inscreve o usuário ao selecionar um canal disponível e cria canais pela mesma API.
 
@@ -64,7 +64,11 @@ docker compose -f docker-compose-dev.yml run --rm --build --no-deps message-serv
 
 ## Notificações em Tempo Real
 
-O serviço consome os eventos `message.created` da fila `classhub.messages` e os transmite aos clientes conectados por WebSocket. A conexão fica disponível em `ws://localhost:8083/ws?token=<jwt>`; o token é validado pelo Auth Service e as origens permitidas são configuradas em `WS_ALLOWED_ORIGINS`. Como o modelo atual de mensagens não define canais ou destinatários, os eventos são transmitidos a todos os clientes autenticados conectados. Clientes desconectados podem consultar o histórico pela API de mensagens.
+O serviço consome os eventos `message.created.v1` da fila `notifications.message-created.v1` e os transmite aos clientes conectados por WebSocket. A conexão fica disponível em `ws://localhost:8083/ws?token=<jwt>`; o token é validado pelo Auth Service e as origens permitidas são configuradas em `WS_ALLOWED_ORIGINS`. Como o modelo atual de mensagens não define canais ou destinatários, os eventos são transmitidos a todos os clientes autenticados conectados. Clientes desconectados podem consultar o histórico pela API de mensagens.
+
+### Convenção de nomes para recursos de mensageria
+
+Os nomes dos eventos seguem `<domínio>.<ação>.v<versão>`, por exemplo `message.created.v1`. Os nomes das filas RabbitMQ seguem `<consumidor>.<evento-em-kebab-case>.v<versão>`, por exemplo `notifications.message-created.v1`. Use o mesmo nome de evento e versão no produtor, no consumidor e nos clientes que interpretam o evento. Mudanças incompatíveis no contrato devem criar uma nova versão do evento e da fila, preservando a anterior enquanto houver consumidores que dependam dela.
 
 Os testes também rodam no container, sem instalar dependências no host:
 
@@ -112,4 +116,3 @@ Este projeto tem como finalidade aplicar, de forma prática, os conceitos estuda
 **Instituto Federal do Sul de Minas Gerais – Campus Poços de Caldas**
 
 Disciplina: **Sistemas Distribuídos**
-

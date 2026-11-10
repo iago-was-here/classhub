@@ -53,7 +53,7 @@ test('broadcasts events only to authenticated WebSocket clients', async () => {
 
     const event = {
         eventId: 'event-123',
-        type: 'message.created',
+        type: 'message.created.v1',
         data: { id: 'message-123', channelId: 'channel-123', text: 'Olá' }
     };
     const received = new Promise((resolve, reject) => {

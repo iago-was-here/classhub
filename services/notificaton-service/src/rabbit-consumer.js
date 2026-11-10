@@ -1,6 +1,6 @@
 const amqp = require('amqplib');
 
-const QUEUE_NAME = 'classhub.messages';
+const QUEUE_NAME = 'notifications.message-created.v1';
 
 function delay(milliseconds) {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -10,7 +10,7 @@ function isMessageEvent(event) {
     return Boolean(
         event &&
         typeof event.eventId === 'string' &&
-        event.type === 'message.created' &&
+        event.type === 'message.created.v1' &&
         event.data &&
         typeof event.data.channelId === 'string' &&
         typeof event.data.id === 'string' &&

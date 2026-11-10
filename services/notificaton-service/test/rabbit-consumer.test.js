@@ -57,7 +57,7 @@ test('acks a valid message event after delivery succeeds', async () => {
 
     const event = {
         eventId: 'event-1',
-        type: 'message.created',
+        type: 'message.created.v1',
         data: { id: 'message-1', channelId: 'channel-1', authorId: 'user-1', text: 'Olá' }
     };
     const incoming = message(event);
@@ -84,7 +84,7 @@ test('discards malformed events and requeues delivery failures', async () => {
 
     const valid = message({
         eventId: 'event-2',
-        type: 'message.created',
+        type: 'message.created.v1',
         data: { id: 'message-2', channelId: 'channel-1', authorId: 'user-1', text: 'Olá' }
     });
     await broker.deliver(valid);
