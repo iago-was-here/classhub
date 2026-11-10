@@ -76,6 +76,13 @@ Os testes também rodam no container, sem instalar dependências no host:
 docker compose -f docker-compose-dev.yml run --rm --build --no-deps notification-service npm test
 ```
 
+O teste de integração abaixo usa o RabbitMQ real para demonstrar distribuição entre consumidores concorrentes (`prefetch`), confirmação de mensagens (`ack`) e reentrega após desconexão do consumidor. Inicie o broker e execute o teste isoladamente:
+
+```sh
+docker compose -f docker-compose-dev.yml up -d rabbitmq
+docker compose -f docker-compose-dev.yml run --rm --build --no-deps -e RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672 notification-service npm run test:rabbit
+```
+
 ## Conceitos de Sistemas Distribuídos Aplicados
 
 * Arquitetura de Microsserviços
